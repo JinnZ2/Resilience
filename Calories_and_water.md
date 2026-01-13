@@ -24,7 +24,7 @@ Urban containers eventually "mine out" the soil. Without external fertilizer, th
 
 • The Method: "Humanure" or urine diversion (high in Nitrogen/Phosphorus/Potassium).
 
-• Caution: This requires strict fermentation or solar-heat processing to ensure the Pack Protocol isn't compromised by pathogens.
+• Caution: This requires strict fermentation or solar-heat processing to ensure it isn't compromised by pathogens.
 
 4. Mushroom Substrate Sovereignty
 
@@ -41,7 +41,7 @@ The  illustrates the density.
 
 Critical Refinement: The "Hunger Gap"
 
-Your framework assumes a continuous harvest. In Zone 3-5 (Midwest), the "Hunger Gap" occurs in late winter/early spring when stored supplies are low and new growth hasn't started.
+This framework assumes a continuous harvest. In Zone 3-5 (Midwest), the "Hunger Gap" occurs in late winter/early spring when stored supplies are low and new growth hasn't started.
 
 In an urban context, the "Sovereign/Autonomous" protocol requires a shift from harvesting wild biomass like cattails to optimizing waste streams. If you can't forage from a marsh, you forage from the technosphere.
 
@@ -74,7 +74,7 @@ Functional Comparison: Urban vs. Wild
 
 Food for Thought: The "Greywater" Integration
 
-Since you utilize cattails, you're likely aware of their role in phytoremediation (filtering water). In a sovereign urban setup, the challenge is replicating this biological filtration without the space for a pond. This usually leads to biochar-integrated vertical filtration, using charred urban wood waste to create the "active" surface area that cattail roots would normally provide in a wetland.
+If youve ever utilized cattails, you're likely aware of their role in phytoremediation (filtering water). In a sovereign urban setup, the challenge is replicating this biological filtration without the space for a pond. This usually leads to biochar-integrated vertical filtration, using charred urban wood waste to create the "active" surface area that cattail roots would normally provide in a wetland.
 
 The most viable urban starch sources are those with high-yield rhizomes or taproots.
 
