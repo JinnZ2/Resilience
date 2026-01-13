@@ -142,4 +142,57 @@ Frame 28: The "Non-Verbal" Hive Mind
 Frame 29: The "Ghost" Perimeter
 
 When the Pack rests, the perimeter is not a fence; it is a tripwire of sensors.
+
 • The Piezoelectric Alarm: Salvage the "clicker" from a lighter or the buzzer from a discarded microwave. Wire it to a thin fishing line. If the line is tripped, the piezoelectric crystal generates a small spark or a "click" that is audible only to the Pack’s Acoustic Waveguides (Frame 11).
+
+Part VI: Biometric & EMF Obfuscation
+
+
+Frame 30: The "CV Dazzle" & Geometric Masking
+
+Facial recognition AI looks for the bridge of the nose, the orbital sockets, and the symmetry of the jawline.
+
+• The Protocol: Use "Asymmetric Camouflage." Use your Biochar/Honey paste or scavenged grease to draw bold, dark lines that cross these key landmarks (e.g., a diagonal line from the forehead across one eye to the opposite jaw).
+
+• The Effect: This "breaks" the face's geometry. The AI cannot find the "anchor points" required to generate a biometric template.
+
+• Thermal Masking: Apply a thicker layer of grease to the forehead and cheeks. These are high-heat areas; the grease acts as a temporary thermal insulator against short-range IR sensors.
+
+
+Frame 31: The Faraday Pouch (Signal Sovereignty)
+
+Scavenged electronics (phones, tablets, GPS) are tracking beacons unless shielded.
+
+• The Build: Use multiple layers of heavy-duty Aluminum Foil or copper mesh from discarded screen doors.
+
+• The Protocol: The device must be wrapped such that no "seams" allow waves to leak. A "Nested" approach—placing the device in a foil-lined bag, then inside another—is mandatory.
+
+• The Test: Place a phone in the pouch and try to call it. If it rings, the "Skin Depth" of the shield is insufficient. Add more layers.
+
+
+Part VII: Sovereign Logistics (Distributed Caching)
+
+A Sovereign actor never carries their entire "life" on their back. If you are stopped and searched, a heavy tactical bag is a "guilt signal."
+
+
+Frame 32: The "Sub-Surface" Cache
+
+• The Target: Use the "Utility Corridors" (Frame 11). Abandoned manholes or "Dead" steam pipes are ideal.
+
+• The Vessel: Use PVC piping with capped ends, sealed with the Cyanoacrylate (Frame 21). This is waterproof, rodent-proof, and can be buried or hidden in plain sight as "abandoned plumbing."
+
+• The Contents: Each cache should be a "Module"—one for 3 days of Starch/Lipids, one for Medical/Surgical, and one for Communication/Power.
+
+
+Frame 33: The "In Plain Sight" Cache
+
+• The Protocol: Urban environments are full of "Functional Voids"—the space inside a hollow concrete bollard, the gap behind a loose brick in a retaining wall, or the interior of a discarded appliance in an alley.
+
+• The Marker: Never mark a cache with paint. Use the Scent Protocol (Frame 12) or Acoustic Mapping. For example: "The cache is 10 paces leeward of the bridge pylon where the wind whistles at a high pitch."
+
+
+Frame 34: The "Dead Drop" Rotation
+
+• The Protocol: Never visit a cache more than once every 14 days. This prevents the formation of "Desire Paths" (worn grass or scuffed dirt) that lead observers to your supplies.
+
+• The "Burn" Protocol: If a cache area shows signs of "interference" (a moved stone, a different scent), consider that module "Burned" and do not retrieve it. The Pack's safety is worth more than 3 days of starch.
