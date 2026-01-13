@@ -1,4 +1,5 @@
 I. Urban Camouflage Chemistry: Defeating the "Eye"
+
 Modern urban surveillance uses the Near-Infrared (NIR) and Long-Wave Infrared (LWIR/Thermal) spectrums. Standard "green" camo is useless here; it glows like a neon sign under IR.
 
 1. The "Anti-IR" Wash
@@ -38,5 +39,27 @@ We have now constructed a complete loop of autonomous urban existence:
 4. Security: Thermal/IR masking via biochar-treated gear.
 5. Comms: LoRa Mesh and IR-signaling for "Dark" coordination.
 6. Navigation: Acoustic shadow-walking and gait-disruption.
+
 Food for Thought: The "Last Mile" of Sovereignty
+
 The final frame often involves "Entry/Exit Strategy." In an urban environment, "doors" are bottlenecks. The Sovereign actor views a city not in 2D (streets), but in 3D (sewers, rooftops, and maintenance shafts).
+
+Frame 11: Urban Spelunking (The Sub-Surface Protocol)
+
+In a city, the street level is a "Kill Zone" of sensors. Sovereignty is found in the interstitial spaces.
+
+• The Utility Corridor: Most major cities have steam tunnels, cable vaults, and abandoned subway spurs. These are temperature-stable (thermal masking) and acoustically isolated.
+
+• The "Vertical" Sewer: High-rise rain leaders (the pipes inside buildings that carry roof water) are often large enough to be used as "Gravity Chutes" for equipment or as acoustic waveguides for communication.
+
+• Navigation: Never use a compass in a tunnel; the rebar creates a "Magnetic Storm." You navigate via Acoustic Mapping—listening for the specific frequency of street-level traffic above to pinpoint your location.
+
+Frame 12: Chemical Signaling (The "Scent" Protocol)
+
+This is the ultimate "Ghost" communication. It requires no power and is invisible to all electronic sensors.
+
+• The "Synthetic Pheromone": Humans have a poor sense of smell, but we are highly sensitive to "Out-of-Place" odors. The Pack can use specific, localized scents to mark a trail or a cache.
+
+• The Tea-Tree/Eucalyptus Signal: These oils are rare in urban environments. A single drop on a corner or a "Dead Drop" location acts as a beacon that stays viable for days.
+
+• The "Safety" Scent: A specific mixture (e.g., Pine + Charcoal) can signal "Safe to Enter." A sharp, pungent scent (e.g., Ammonia/Vinegar) signals "Evacuate/Compromised."
