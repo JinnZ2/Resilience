@@ -6,7 +6,7 @@ While greens provide micro-nutrients, the Sovereign Protocol dictates that calor
 
 • The Optimization: Prioritize Kudzu and Dandelion roots during the winter dormant phase. Starch (carbohydrates) is the true currency of survival.
 
-• Next Step: I can provide a specific "Root Processing Protocol" to extract pure starch from Kudzu—similar to Arrowroot—which can be stored as a dry powder indefinitely.
+• Next Step: "Root Processing Protocol" to extract pure starch from Kudzu—similar to Arrowroot—which can be stored as a dry powder indefinitely.
 
 2. Biological OpSec (Operational Security)
 
