@@ -125,3 +125,73 @@ def print_checklist_status(self):
     print(f"CRITICAL: {checklist['critical_failures']}")
 
 
+
+import json
+from typing import Dict, Any
+
+class SurvivalChecker:
+    # Your existing class implementation here...
+    
+    def full_report(self) -> Dict[str, Any]:
+        """Generate a complete survival status report"""
+        # Your existing full_report implementation here...
+        pass
+    
+    def survival_checklist(self) -> Dict[str, Any]:
+        """Generate survival checklist status"""
+        # Your existing survival_checklist implementation here...
+        pass
+    
+    # 2. Add JSON export for simulator integration
+    def export_json(self) -> str:
+        """Export full report as JSON string for simulator integration"""
+        return json.dumps(self.full_report(), indent=2)
+    
+    # 3. Add CLI interface for phone use
+    def print_checklist_status(self):
+        """Print simplified checklist status for mobile/CLI viewing"""
+        checklist = self.survival_checklist()
+        
+        # Clear formatting for mobile display
+        print("\n" + "="*40)
+        print(" SURVIVAL CHECKLIST STATUS")
+        print("="*40)
+        
+        # Status indicators with emoji for quick scanning
+        tier1_status = "✅" if checklist.get('TIER_1_SECURE') else "❌"
+        tier2_status = "✅" if checklist.get('TIER_2_SECURE') else "❌"
+        
+        print(f"{tier1_status} TIER 1: {'SECURE' if checklist.get('TIER_1_SECURE') else 'INSECURE'}")
+        print(f"{tier2_status} TIER 2: {'SECURE' if checklist.get('TIER_2_SECURE') else 'INSECURE'}")
+        
+        # Critical failures with warning
+        critical = checklist.get('critical_failures', 0)
+        if critical > 0:
+            print(f"⚠️  CRITICAL FAILURES: {critical}")
+        else:
+            print(f"✅ CRITICAL FAILURES: {critical}")
+        
+        # Additional details if available
+        if 'failures' in checklist:
+            print("\n" + "-"*40)
+            print("FAILURE DETAILS:")
+            for failure in checklist['failures'][:5]:  # Show first 5 failures
+                print(f"  • {failure}")
+            if len(checklist['failures']) > 5:
+                print(f"  ... and {len(checklist['failures']) - 5} more")
+        
+        print("="*40)
+
+
+# 1. Fix the main guard (typo)
+if __name__ == "__main__":
+    # Example usage
+    checker = SurvivalChecker()
+    
+    # Test the new CLI interface
+    checker.print_checklist_status()
+    
+    # Test JSON export
+    json_output = checker.export_json()
+    print("\nJSON Export Test (first 200 chars):")
+    print(json_output[:200] + "...")
