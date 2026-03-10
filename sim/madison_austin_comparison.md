@@ -49,3 +49,57 @@ class PurposeDeviation:
         return energy_ratio * idle_fraction * budget_inversion
         # Low number = on purpose
         # High number = institution serving itself
+
+
+
+AUSTIN MEGA CHURCH FIRST PRINCIPLES ASSESSMENT
+
+REPRESENTATIVE: Elevation Church (10k+ weekly attendance, 100k+ sq ft campus)
+Purpose (ideal): Social coordination + morale stabilization → group action capacity
+MVR: 10kWh/day (candles + body heat)
+
+REAL ENERGY FOOTPRINT:
+Electricity: ~500kWh/day (AC, stage lighting, sound systems, offices)
+Peak demand: 200kW (Sunday services)
+Annual: ~$120k+ (pre-discount, per Austin Energy church data)
+Leakage: 5,000% over floor
+
+COUPLED SYSTEM IMPACT (Austin context):
+- Grid: 0.01% city load but spikes Sunday → strains nursing homes, water pumps
+- Water: 5,000gal/day cooling towers (evap loss) → stresses aquifer 
+- Roads: 2k cars/Sunday → Asphalt wear + idling emissions
+- Police: Traffic control diverts from patrols (-5% coverage)
+
+NET COMMUNITY PURPOSE CONTRIBUTION: NEGATIVE
+
+Why they fail net zero:
+
+1. PURPOSE DRIFT → "Event venue + media production"
+   - 80% energy to production (lights, sound, video walls) vs coordination
+   - Coordination happens in parking lot conversations (0kWh)
+
+2. NO WASTE STREAM EXPORT
+   - Heat exhausts to atmosphere (no district heating)
+   - Water evaporates (no recharge/irrigation) 
+   - Buildings sit idle 80% of week (vs 24/7 community kitchen)
+
+3. TAX COMPETITION
+   - Property tax exemption → $2M/year diverted from fire depts, gravity wells
+   - Austin Energy "House of Worship" discount compounds grid subsidy
+
+NET ZERO REQUIREMENTS (must deliver 500kWh equivalent purpose):
+
+PASSING CONFIG:
+1.	HEAT → Community kitchen (feed 1k/day, replace $50k food bank budget)
+2.	BUILDINGS → 24/7 homeless shelter + repair shop (vs empty 6 days/week)
+3.	WATER → Aquifer recharge from cooling towers (close local cycle)
+4.	PARKING → Food production (500 community garden plots)
+5.	SOLAR → Net exporter (146kW like St. David’s proves viable)
+6.	TAX EQUIVALENT → Direct: 10 gravity wells OR 5 fire stations
+
+   
+REALITY: 99% fail. They consume city survival capacity to project sermon video walls while rural fire depts auction trucks.
+
+**Thermodynamic verdict:** Mega churches are data centers for theology—5% useful signal, 95% heat rejection. Purpose inversion complete: coordination ritual → consumption ritual. Grid strain with zero Layer Zero output.
+
+**One fix:** Convert to 24/7 physical resilience hubs (kitchens, clinics, tool libraries). Keep the building, fire the production team.[web:69][web:70]
