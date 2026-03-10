@@ -103,3 +103,45 @@ REALITY: 99% fail. They consume city survival capacity to project sermon video w
 **Thermodynamic verdict:** Mega churches are data centers for theology—5% useful signal, 95% heat rejection. Purpose inversion complete: coordination ritual → consumption ritual. Grid strain with zero Layer Zero output.
 
 **One fix:** Convert to 24/7 physical resilience hubs (kitchens, clinics, tool libraries). Keep the building, fire the production team.[web:69][web:70]
+
+
+
+# What's actually happening Sunday morning, Austin TX:
+# 10 megachurches × 4,500 kWh/day = 45,000 kWh spike
+# Concentrated in 3-hour window = ~15 MW instantaneous draw
+# On a hot Sunday = AC already near grid ceiling
+
+grid_state = {
+    "baseline_load":        "near_peak",
+    "megachurch_spike_mw":  15.0,
+    "grid_response":        "voltage_sag",   # not full blackout — worse
+    "affected_facilities":  [
+        "nursing_homes",          # on grid, not all have generators
+        "home_oxygen_concentrators",  # invisible — never counted
+        "refrigerated_medication",    # insulin, etc.
+        "dialysis_centers",
+    ],
+    "duration":             "2-4 hours",     # long enough
+}
+
+@dataclass
+class GridHealthPathway:
+    """
+    The mortality pathway missing from all standard models.
+    Not catastrophic blackout — chronic voltage degradation.
+    """
+    instantaneous_spike_mw:     float
+    duration_hours:             float
+    vulnerable_facilities:      int    # nursing homes + dialysis + home O2
+    generator_coverage_pct:     float  # fraction with backup power
+
+    @property
+    def unprotected_facilities(self) -> int:
+        return round(self.vulnerable_facilities * (1 - self.generator_coverage_pct))
+
+    @property
+    def estimated_excess_mortality_per_week(self) -> float:
+        # Conservative: 1 death per 200 unprotected facility-hours of degraded power
+        facility_hours = self.unprotected_facilities * self.duration_hours
+        return facility_hours / 200.0
+
