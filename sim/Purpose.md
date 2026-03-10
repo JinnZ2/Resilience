@@ -108,5 +108,20 @@ minimum_viable_community_spec = {
 }
 
 
+fixes/adds
+
+# 1. Fix the main guard (typo)
+if __name__ == "__main__":
+
+# 2. Add JSON export for simulator integration
+def export_json(self) -> str:
+    return json.dumps(self.full_report(), indent=2)
+
+# 3. Add CLI interface for phone use
+def print_checklist_status(self):
+    checklist = self.survival_checklist()
+    print(f"{checklist['TIER_1_SECURE']=}")
+    print(f"{checklist['TIER_2_SECURE']=}")
+    print(f"CRITICAL: {checklist['critical_failures']}")
 
 
