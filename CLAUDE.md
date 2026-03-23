@@ -9,73 +9,106 @@ Guide for AI assistants working in this repository.
 - **License:** CC0 (public domain)
 - **Primary language:** Python 3 (stdlib only, no external dependencies)
 - **Secondary:** React/JSX (standalone interactive visualizations)
-- **Documentation:** Extensive Markdown (21+ files)
+- **Documentation:** Extensive Markdown (25+ files)
+- **Total Python:** ~11,300 lines across 22 modules
 
 ## Repository Structure
 
 ```
 Resilience/
-├── sim/                          # Core simulation framework
-│   ├── run.py                    # Entry point: python sim/run.py
-│   ├── core.py                   # Dataclasses, enums (StressScenario, Season, etc.)
-│   ├── engine.py                 # Simulation engine (run_city_assessment, print_report)
-│   ├── schema_v2.py              # Domain schema definitions
-│   ├── economics.py              # Economic modeling
-│   ├── survival_engineering.py   # Shuttle/submarine criticality tiers
-│   ├── energy_games.py           # Energy system game theory
-│   ├── city_thermodynamics.py    # City-level thermodynamic analysis
-│   ├── city_optimization.py      # City optimization routines
-│   ├── thermodynamic_impact.py   # Impact assessment
-│   ├── resilience_offset.py      # Offset calculations
-│   ├── purpose_deviation.py      # Purpose drift detection
-│   ├── phi_growth.py             # Growth modeling
-│   ├── institution_registry.py   # Institution tracking
-│   ├── intituitional_first_principles.py  # Institutional analysis
-│   ├── datacenter_net_zero.py    # Data center energy modeling
+├── sim/                            # Core simulation framework (no __init__.py files)
+│   ├── run.py                      # Entry point (38 lines)
+│   ├── core.py                     # Dataclasses, enums — StressScenario, Season, CityNode, etc. (488 lines)
+│   ├── engine.py                   # Simulation engine — run_city_assessment(), print_report() (193 lines)
+│   ├── schema_v2.py                # Domain schema definitions (749 lines)
+│   ├── economics.py                # Economic modeling (860 lines)
+│   ├── survival_engineering.py     # Shuttle/submarine criticality tiers (918 lines)
+│   ├── energy_games.py             # Energy system game theory (964 lines)
+│   ├── city_thermodynamics.py      # City-level thermodynamic analysis (560 lines)
+│   ├── city_optimization.py        # City optimization routines (478 lines)
+│   ├── thermodynamic_impact.py     # Impact assessment (626 lines)
+│   ├── resilience_offset.py        # Offset calculations (39 lines)
+│   ├── purpose_deviation.py        # Purpose drift detection (589 lines)
+│   ├── phi_growth.py               # Growth modeling (380 lines)
+│   ├── institution_registry.py     # Institution tracking (410 lines)
+│   ├── intituitional_first_principles.py  # Institutional analysis (322 lines) [NOTE: filename typo is intentional]
+│   ├── datacenter_net_zero.py      # Data center energy modeling (621 lines)
 │   ├── cities/
-│   │   ├── madison_wi.py         # Madison, WI city model (build_madison())
-│   │   └── coupling.py           # Cross-domain coupling terms
+│   │   ├── madison_wi.py           # Madison, WI city model — build_madison() (360 lines)
+│   │   └── coupling.py             # Cross-domain coupling terms (469 lines)
 │   ├── domains/
-│   │   ├── soil_regeneration.py  # Soil health modeling
-│   │   ├── incentive_alignment.py # Incentive structure analysis
-│   │   └── triage_layer.py       # Triage/priority framework
+│   │   ├── soil_regeneration.py    # Soil health modeling (837 lines, largest domain)
+│   │   ├── incentive_alignment.py  # Incentive structure analysis (447 lines)
+│   │   └── triage_layer.py         # Triage/priority framework (527 lines)
 │   ├── visualizations/
-│   │   └── energy_topology.jsx   # Energy topology React visualization
+│   │   ├── energy_topology.jsx     # Energy topology React visualization
+│   │   └── README.md
 │   ├── docs/
-│   │   ├── physics.py            # Physics constraint utilities
-│   │   └── prayer_index.md       # Supporting documentation
-│   ├── Charter.md                # Layer Zero Charter (system requirements)
-│   ├── Purpose.md                # Criticality tier framework
-│   └── Urban_Resilience.md       # Framework summary
+│   │   ├── physics.py              # Physics constraint utilities (175 lines)
+│   │   └── prayer_index.md
+│   ├── Charter.md                  # Layer Zero Charter
+│   ├── Purpose.md                  # Criticality tier framework
+│   ├── Urban_Resilience.md         # Framework summary
+│   ├── suburban_tax_flow.md        # Suburban tax flow analysis
+│   ├── madison_austin_comparison.md # City comparison
+│   └── datacenter_net0.md          # Data center net-zero docs
 ├── Models/
-│   ├── food-resilience.py        # Food system model
-│   ├── Time-resource.py          # Time-resource modeling
-│   ├── README.md                 # Food system model docs
-│   ├── Community.md              # Community model docs
-│   ├── Physics-First-AI.md       # Physics-first AI approach
-│   └── Simulation.md             # Simulation documentation
+│   ├── food-resilience.py          # Food system model (174 lines)
+│   ├── Time-resource.py            # Time-resource modeling (76 lines)
+│   ├── README.md                   # Food system model docs
+│   ├── Community.md                # Community model docs
+│   ├── Physics-First-AI.md         # Physics-first AI approach
+│   └── Simulation.md              # Simulation documentation
 ├── Dashboard/
-│   ├── Routing-ops.md            # Routing operations (30KB)
-│   └── Routing-resilience.md     # Routing resilience (38KB)
+│   ├── Routing-ops.md              # Routing operations (30KB)
+│   └── Routing-resilience.md       # Routing resilience (38KB)
 ├── PhysicsGuard/
-│   └── README.md                 # Semantic-to-physical constraint translator
-├── Food-resiliency.jsx           # Interactive food resilience simulation
-├── NVC-game theory-sim.jsx       # NVC game theory simulation
-├── README.md                     # Master overview (28KB)
-├── SYSTEM_MAP.md                 # 5-layer architecture diagram
-├── Sovereign.md                  # Foundational framework (39KB)
-├── Field-manual.md               # Practical field manual
-└── [other .md files]             # Thematic documentation
+│   └── README.md                   # Semantic-to-physical constraint translator
+├── Food-resiliency.jsx             # Interactive food resilience simulation
+├── NVC-game theory-sim.jsx         # NVC game theory simulation
+├── README.md                       # Master overview (28KB)
+├── SYSTEM_MAP.md                   # 5-layer architecture diagram
+├── Sovereign.md                    # Foundational framework (39KB)
+├── Field-manual.md                 # Practical field manual
+├── nutrient-cascade.md             # Nutrient cascade model
+├── combine-cognition.md            # Combine cognition framework
+├── game-theory-proofs.md           # 13 game theory axiom failure proofs
+├── thermodynamics-institutional-analysis.md
+├── communication-infrastructure.md # CB/LoRa/HAM mesh network design
+├── Camouflage-network.md           # Network camouflage concepts
+├── Fats-communication.md           # Fats and communication systems
+├── Calories_and_water.md           # Caloric and water modeling
+└── Urban_food_reselience.md        # Urban food resilience [NOTE: filename typo]
 ```
 
 ## Running the Simulation
 
 ```bash
-cd sim
-python run.py
+# From the repository root (NOT from sim/):
+python sim/run.py
 ```
 
-This creates a Madison, WI city model and runs stress scenarios (grid failure, supply chain disruption) through the simulation engine.
+All imports use absolute paths (`from sim.core import ...`), so the working directory must be the repo root.
+
+**Current blocker:** `sim/core.py` has a syntax error — a truncated docstring with zero-width space characters at line 488 in the `DecisionAuthorityNode` class. This prevents all imports from `sim.core` and blocks execution. Fix the truncated docstring to restore functionality.
+
+## Import Chain
+
+```
+sim/run.py
+  ├── sim.core (StressScenario, StressType, Season)
+  ├── sim.engine (run_city_assessment, print_report)
+  │   └── sim.core (CityNode, ResilienceFoundation, InfrastructureLayers, StressScenario, RedundancyLevel)
+  └── sim.cities.madison_wi (build_madison)
+      └── sim.core (wildcard import)
+
+sim/docs/physics.py
+  └── sim.energy_games
+```
+
+Most other modules (`economics.py`, `schema_v2.py`, `survival_engineering.py`, etc.) are self-contained and not imported by the simulation entry point — they define domain models independently.
+
+**No `__init__.py` files exist.** Python resolves `from sim.core import ...` via filesystem paths from the working directory, not as proper packages.
 
 ## Architecture
 
@@ -96,11 +129,27 @@ The project follows a **5-layer architecture** (see `SYSTEM_MAP.md`):
 
 - **Python stdlib only** — no external dependencies (intentional design for resilience)
 - **Dataclasses** for all schema definitions (`@dataclass` extensively in `core.py`, `schema_v2.py`)
-- **Enums** for state variables and categorical types
+- **Enums** for state variables and categorical types (`Season`, `StressType`, `DensityType`, `RedundancyLevel`, `ZoneType`)
 - **Type hints** throughout (`typing.Optional`, `typing.List`, `typing.Dict`)
-- **CC0 headers** on all source files
+- **CC0 headers** on all source files (format: `CC0 public domain — github.com/JinnZ2/urban-resilience-sim`)
 - **Physics-first modeling** — all claims must be grounded in thermodynamic constraints
 - **React hooks pattern** in JSX files (useState, useCallback, useMemo)
+- **No linting or formatting tools** configured — code follows PEP 8 informally
+- **No `.gitignore`** — intentional minimalism
+
+## Key Data Structures (sim/core.py)
+
+| Class | Purpose |
+|-------|---------|
+| `Season` (Enum) | WINTER, SPRING, SUMMER, FALL |
+| `StressType` (Enum) | GRID_FAILURE, SUPPLY_CHAIN_DISRUPTION, POPULATION_INFLUX, etc. |
+| `RedundancyLevel` (Enum) | NONE(0) through TRIPLE(3) |
+| `StressScenario` (dataclass) | Defines a stress test: type, severity, duration, season, notes |
+| `CognitiveReadinessLayer` (dataclass) | Human cognitive capacity as infrastructure |
+| `CityNode` (dataclass) | Top-level city model with zones and infrastructure |
+| `ResilienceFoundation` (dataclass) | Foundation layers for resilience assessment |
+| `InfrastructureLayers` (dataclass) | Infrastructure redundancy and capacity |
+| `DecisionAuthorityNode` (dataclass) | **Currently broken** — truncated at line 488 |
 
 ## Key Design Principles
 
@@ -110,16 +159,24 @@ The project follows a **5-layer architecture** (see `SYSTEM_MAP.md`):
 4. **Relational knowledge over propositional.** Knowledge is stored as relationships between systems, not isolated facts. Preserve cross-references and coupling terms.
 5. **Ground truth calibration.** Models stay coupled to physical reality through direct observation data.
 
+## Known Issues
+
+1. **`sim/core.py` syntax error (BLOCKER):** The `DecisionAuthorityNode` dataclass (line 481) has a truncated docstring containing zero-width space characters (U+200B) at line 488. This causes `SyntaxError: unterminated triple-quoted string literal` and prevents `python sim/run.py` from running.
+2. **Filename typo:** `sim/intituitional_first_principles.py` — "intituitional" should be "institutional". File is not imported elsewhere, so renaming is safe but not urgent.
+3. **Filename typo:** `Urban_food_reselience.md` — "reselience" should be "resilience".
+4. **Missing `__init__.py` files:** `sim/`, `sim/cities/`, `sim/domains/`, `sim/docs/`, `sim/visualizations/` — currently works because Python resolves from CWD, but not proper package structure.
+5. **Many modules are standalone:** Most Python files beyond the core import chain (`economics.py`, `schema_v2.py`, `survival_engineering.py`, domain modules) define models but are not wired into the simulation entry point.
+
 ## Testing
 
 There is no formal test suite. Validation is done through:
 - Physical/thermodynamic constraint checking (PhysicsGuard approach)
-- Running simulation scenarios via `sim/run.py`
+- Running simulation scenarios via `python sim/run.py`
 - Manual verification against ground-truth observations
 
 ## No CI/CD
 
-No GitHub Actions or automated pipelines. Changes are verified manually.
+No GitHub Actions, no automated pipelines, no pre-commit hooks, no linter config. Changes are verified manually.
 
 ## When Making Changes
 
@@ -128,5 +185,7 @@ No GitHub Actions or automated pipelines. Changes are verified manually.
 - Keep code self-contained (stdlib only)
 - Add CC0 headers to new source files
 - Follow existing patterns: dataclasses for schemas, enums for categoricals
+- Run from repo root: `python sim/run.py` (not from inside `sim/`)
 - Documentation files are substantial and interconnected — update cross-references when renaming or moving content
 - The `sim/` directory is the active codebase; root-level `.md` files are documentation/theory
+- Many modules are standalone domain models — adding new ones does not require modifying existing imports
