@@ -53,8 +53,8 @@ Resilience/
 │   ├── madison_austin_comparison.md # City comparison
 │   └── datacenter_net0.md          # Data center net-zero docs
 ├── Models/
-│   ├── food-resilience.py          # Food system model (174 lines)
-│   ├── Time-resource.py            # Time-resource modeling (76 lines)
+│   ├── food-resilience.py          # Food system model — Michaelis-Menten yield + ENSO forcing (174 lines)
+│   ├── Time-resource.py            # Time-resource modeling — REQUIRES NumPy (76 lines)
 │   ├── README.md                   # Food system model docs
 │   ├── Community.md                # Community model docs
 │   ├── Physics-First-AI.md         # Physics-first AI approach
@@ -106,7 +106,27 @@ sim/docs/physics.py
   └── sim.energy_games
 ```
 
-Most other modules (`economics.py`, `schema_v2.py`, `survival_engineering.py`, etc.) are self-contained and not imported by the simulation entry point — they define domain models independently.
+Most other modules are self-contained domain models not imported by the entry point. Several use `try/except` sibling imports for optional integration:
+
+```
+Standalone domain modules (define models independently):
+  economics.py           — substrate accounting (replaces GDP)
+  schema_v2.py           — v2 schema with explicit formulas + build_madison_v2()
+  city_thermodynamics.py — institutions as heat engines + build_city_1000()
+  city_optimization.py   — cross-domain upgrade testing (2x purpose / 0.5x energy rule)
+  thermodynamic_impact.py — replaces IMPLAN with thermodynamic reality
+  survival_engineering.py — shuttle/submarine criticality tiers (T1-T4)
+  purpose_deviation.py   — drift detection via ungameable signals
+  phi_growth.py          — golden ratio as thermodynamic scaling law
+  institution_registry.py — unified scoring across institution types
+  datacenter_net_zero.py — data centers as thermodynamic institutions
+  resilience_offset.py   — entropy offset mechanism
+  intituitional_first_principles.py — operator substitutability
+  cities/coupling.py     — multi-domain shock propagation + knowledge decay clocks
+  domains/soil_regeneration.py — soil as substrate; knowledge holder age as countdown
+  domains/incentive_alignment.py — incentives as infrastructure
+  domains/triage_layer.py — financial vs thermodynamic triage comparison
+```
 
 **No `__init__.py` files exist.** Python resolves `from sim.core import ...` via filesystem paths from the working directory, not as proper packages.
 
@@ -127,15 +147,16 @@ The project follows a **5-layer architecture** (see `SYSTEM_MAP.md`):
 
 ## Code Conventions
 
-- **Python stdlib only** — no external dependencies (intentional design for resilience)
+- **Python stdlib only** — no external dependencies (intentional design for resilience). One exception: `Models/Time-resource.py` uses NumPy.
 - **Dataclasses** for all schema definitions (`@dataclass` extensively in `core.py`, `schema_v2.py`)
 - **Enums** for state variables and categorical types (`Season`, `StressType`, `DensityType`, `RedundancyLevel`, `ZoneType`)
 - **Type hints** throughout (`typing.Optional`, `typing.List`, `typing.Dict`)
 - **CC0 headers** on all source files (format: `CC0 public domain — github.com/JinnZ2/urban-resilience-sim`)
 - **Physics-first modeling** — all claims must be grounded in thermodynamic constraints
+- **Graceful degradation** — higher-level modules (`survival_engineering.py`, `thermodynamic_impact.py`, `datacenter_net_zero.py`, `purpose_deviation.py`) use `try/except` for sibling imports so they function even if dependencies are missing
+- **Method-rich dataclasses** — domain logic lives on the objects (e.g., `entropy_risk()`, `survival_window_hours()`, `thermodynamic_value()`)
 - **React hooks pattern** in JSX files (useState, useCallback, useMemo)
 - **No linting or formatting tools** configured — code follows PEP 8 informally
-- **No `.gitignore`** — intentional minimalism
 
 ## Key Data Structures (sim/core.py)
 
@@ -165,7 +186,8 @@ The project follows a **5-layer architecture** (see `SYSTEM_MAP.md`):
 2. **Filename typo:** `sim/intituitional_first_principles.py` — "intituitional" should be "institutional". File is not imported elsewhere, so renaming is safe but not urgent.
 3. **Filename typo:** `Urban_food_reselience.md` — "reselience" should be "resilience".
 4. **Missing `__init__.py` files:** `sim/`, `sim/cities/`, `sim/domains/`, `sim/docs/`, `sim/visualizations/` — currently works because Python resolves from CWD, but not proper package structure.
-5. **Many modules are standalone:** Most Python files beyond the core import chain (`economics.py`, `schema_v2.py`, `survival_engineering.py`, domain modules) define models but are not wired into the simulation entry point.
+5. **Many modules are standalone:** Most Python files beyond the core import chain define models but are not wired into the simulation entry point. Several have their own builder functions (e.g., `build_madison_v2()`, `build_city_1000()`, `build_madison_economics()`, `build_madison_coupled_system()`).
+6. **`Models/Time-resource.py` uses NumPy:** The only file in the repo with an external dependency (`import numpy`). All other Python is stdlib-only.
 
 ## Testing
 
