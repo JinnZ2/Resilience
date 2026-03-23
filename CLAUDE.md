@@ -16,7 +16,7 @@ Guide for AI assistants working in this repository.
 
 ```
 Resilience/
-├── sim/                            # Core simulation framework (no __init__.py files)
+├── sim/                            # Core simulation framework (Python package)
 │   ├── run.py                      # Entry point (38 lines)
 │   ├── core.py                     # Dataclasses, enums — StressScenario, Season, CityNode, etc. (488 lines)
 │   ├── engine.py                   # Simulation engine — run_city_assessment(), print_report() (193 lines)
@@ -31,7 +31,7 @@ Resilience/
 │   ├── purpose_deviation.py        # Purpose drift detection (589 lines)
 │   ├── phi_growth.py               # Growth modeling (380 lines)
 │   ├── institution_registry.py     # Institution tracking (410 lines)
-│   ├── intituitional_first_principles.py  # Institutional analysis (322 lines) [NOTE: filename typo is intentional]
+│   ├── institutional_first_principles.py  # Institutional analysis (322 lines)
 │   ├── datacenter_net_zero.py      # Data center energy modeling (621 lines)
 │   ├── cities/
 │   │   ├── madison_wi.py           # Madison, WI city model — build_madison() (360 lines)
@@ -78,19 +78,17 @@ Resilience/
 ├── Camouflage-network.md           # Network camouflage concepts
 ├── Fats-communication.md           # Fats and communication systems
 ├── Calories_and_water.md           # Caloric and water modeling
-└── Urban_food_reselience.md        # Urban food resilience [NOTE: filename typo]
+└── Urban_food_resilience.md         # Urban food resilience
 ```
 
 ## Running the Simulation
 
 ```bash
-# From the repository root (NOT from sim/):
-python sim/run.py
+# From the repository root:
+python -m sim.run
 ```
 
-All imports use absolute paths (`from sim.core import ...`), so the working directory must be the repo root.
-
-**Current blocker:** `sim/core.py` has a syntax error — a truncated docstring with zero-width space characters at line 488 in the `DecisionAuthorityNode` class. This prevents all imports from `sim.core` and blocks execution. Fix the truncated docstring to restore functionality.
+All imports use absolute paths (`from sim.core import ...`). The `sim/` directory is a proper Python package with `__init__.py` files.
 
 ## Import Chain
 
@@ -121,14 +119,14 @@ Standalone domain modules (define models independently):
   institution_registry.py — unified scoring across institution types
   datacenter_net_zero.py — data centers as thermodynamic institutions
   resilience_offset.py   — entropy offset mechanism
-  intituitional_first_principles.py — operator substitutability
+  institutional_first_principles.py — operator substitutability
   cities/coupling.py     — multi-domain shock propagation + knowledge decay clocks
   domains/soil_regeneration.py — soil as substrate; knowledge holder age as countdown
   domains/incentive_alignment.py — incentives as infrastructure
   domains/triage_layer.py — financial vs thermodynamic triage comparison
 ```
 
-**No `__init__.py` files exist.** Python resolves `from sim.core import ...` via filesystem paths from the working directory, not as proper packages.
+All subdirectories have `__init__.py` files for proper Python package structure.
 
 ## Architecture
 
@@ -170,7 +168,7 @@ The project follows a **5-layer architecture** (see `SYSTEM_MAP.md`):
 | `CityNode` (dataclass) | Top-level city model with zones and infrastructure |
 | `ResilienceFoundation` (dataclass) | Foundation layers for resilience assessment |
 | `InfrastructureLayers` (dataclass) | Infrastructure redundancy and capacity |
-| `DecisionAuthorityNode` (dataclass) | **Currently broken** — truncated at line 488 |
+| `DecisionAuthorityNode` (dataclass) | Who decides during crisis; absentee ownership tracking |
 
 ## Key Design Principles
 
@@ -182,18 +180,14 @@ The project follows a **5-layer architecture** (see `SYSTEM_MAP.md`):
 
 ## Known Issues
 
-1. **`sim/core.py` syntax error (BLOCKER):** The `DecisionAuthorityNode` dataclass (line 481) has a truncated docstring containing zero-width space characters (U+200B) at line 488. This causes `SyntaxError: unterminated triple-quoted string literal` and prevents `python sim/run.py` from running.
-2. **Filename typo:** `sim/intituitional_first_principles.py` — "intituitional" should be "institutional". File is not imported elsewhere, so renaming is safe but not urgent.
-3. **Filename typo:** `Urban_food_reselience.md` — "reselience" should be "resilience".
-4. **Missing `__init__.py` files:** `sim/`, `sim/cities/`, `sim/domains/`, `sim/docs/`, `sim/visualizations/` — currently works because Python resolves from CWD, but not proper package structure.
-5. **Many modules are standalone:** Most Python files beyond the core import chain define models but are not wired into the simulation entry point. Several have their own builder functions (e.g., `build_madison_v2()`, `build_city_1000()`, `build_madison_economics()`, `build_madison_coupled_system()`).
-6. **`Models/Time-resource.py` uses NumPy:** The only file in the repo with an external dependency (`import numpy`). All other Python is stdlib-only.
+1. **Many modules are standalone:** Most Python files beyond the core import chain define models but are not wired into the simulation entry point. Several have their own builder functions (e.g., `build_madison_v2()`, `build_city_1000()`, `build_madison_economics()`, `build_madison_coupled_system()`).
+2. **`Models/Time-resource.py` uses NumPy:** The only file in the repo with an external dependency (`import numpy`). All other Python is stdlib-only.
 
 ## Testing
 
 There is no formal test suite. Validation is done through:
 - Physical/thermodynamic constraint checking (PhysicsGuard approach)
-- Running simulation scenarios via `python sim/run.py`
+- Running simulation scenarios via `python -m sim.run`
 - Manual verification against ground-truth observations
 
 ## No CI/CD
@@ -207,7 +201,7 @@ No GitHub Actions, no automated pipelines, no pre-commit hooks, no linter config
 - Keep code self-contained (stdlib only)
 - Add CC0 headers to new source files
 - Follow existing patterns: dataclasses for schemas, enums for categoricals
-- Run from repo root: `python sim/run.py` (not from inside `sim/`)
+- Run from repo root: `python -m sim.run`
 - Documentation files are substantial and interconnected — update cross-references when renaming or moving content
 - The `sim/` directory is the active codebase; root-level `.md` files are documentation/theory
 - Many modules are standalone domain models — adding new ones does not require modifying existing imports
