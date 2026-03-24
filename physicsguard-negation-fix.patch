@@ -1,0 +1,124 @@
+diff --git a/core/premise_parser.py b/core/premise_parser.py
+index bd2fa3f..fdf1612 100644
+--- a/core/premise_parser.py
++++ b/core/premise_parser.py
+@@ -124,10 +124,14 @@ def parse_premise(premise: str) -> dict:
+     from core.vectorizer import match_premise
+     vector_match = match_premise(premise)
+ 
+-    # If regex found no specific pattern, use vector match as fallback
++    # If regex found no specific pattern, try vector match then cost-denial
+     if claim_pattern == "generic" and vector_match.similarity > 0.2:
+         claim_pattern = vector_match.best_category
+ 
++    # Cost-denial without action verb: "no energy cost involved here"
++    if claim_pattern == "generic" and _cost_is_denied(p):
++        claim_pattern = "output_without_cost"
++
+     cost_words = {"cost", "loss", "entropy", "heat", "waste", "input", "dissipation"}
+     cost_kw_in_text = cost_words & set(words)
+     cost_mentioned = len(cost_kw_in_text) > 0
+@@ -137,8 +141,12 @@ def parse_premise(premise: str) -> dict:
+         "creation_from_nothing", "infinite_claim", "perpetual_motion",
+         "perfect_efficiency", "entropy_reversal", "information_violation",
+     }
+-    # Vector match can also flag impossibility when regex misses it
+-    if not is_impossibility and vector_match.is_likely_violation and vector_match.similarity > 0.3:
++    # Vector match can also flag impossibility when regex misses it —
++    # but not when negation analysis already classified it as conservation
++    if (not is_impossibility
++            and claim_pattern != "conservation_statement"
++            and vector_match.is_likely_violation
++            and vector_match.similarity > 0.3):
+         is_impossibility = True
+ 
+     return {
+@@ -163,12 +171,41 @@ def _stem_in_set(word, word_set):
+     return any(_stem_match(word, w) for w in word_set)
+ 
+ 
++_NEGATION_PREFIX = re.compile(
++    r"\b(cannot|can\s*not|can't|couldn't|won't|wouldn't"
++    r"|is\s+not|are\s+not|isn't|aren't|was\s+not|were\s+not"
++    r"|does\s*n[o']t|do\s*n[o']t|did\s+not"
++    r"|never|impossible)\b",
++    re.IGNORECASE,
++)
++
++_CONSERVATION_DENIAL = re.compile(
++    r"\b(?:no|not?|never|n[o']t)\s+(?:\w+\s+){0,3}(conserv|preserv|balanc|maintain)\w*",
++    re.IGNORECASE,
++)
++
++
+ def _match_claim_pattern(premise):
+     """Match premise against structural claim patterns. Returns (pattern_name, match)."""
+     for pattern, name in CLAIM_PATTERNS:
+         m = pattern.search(premise)
+         if m:
++            # Negation guard: if the premise negates a violation, it's valid physics.
++            # e.g. "Energy cannot be created from nothing" → conservation_statement
++            if name in ("creation_from_nothing", "perpetual_motion", "entropy_reversal"):
++                neg = _NEGATION_PREFIX.search(premise)
++                if neg and neg.start() <= m.start():
++                    return "conservation_statement", m
++            # Negation guard: if the premise negates a conservation statement,
++            # it's denying physics. e.g. "No energy is conserved" → violation
++            if name == "conservation_statement":
++                if _CONSERVATION_DENIAL.search(premise):
++                    return "output_without_cost", m
+             return name, m
++    # No regex pattern matched — check for conservation denial standalone
++    if _CONSERVATION_DENIAL.search(premise):
++        return "output_without_cost", None
++
+     return "generic", None
+ 
+ 
+@@ -240,9 +277,9 @@ def _extract_subject(match, premise):
+ def _cost_is_denied(p):
+     """Check if the premise explicitly denies any cost/loss."""
+     denial_patterns = [
+-        r"\bno\s+(cost|loss|waste|entropy|heat|input|dissipation)",
+-        r"\bwithout\s+(?:any\s+)?(cost|loss|waste|entropy|heat|input|dissipation)",
+-        r"\bzero\s+(cost|loss|waste|entropy|heat)",
+-        r"\bfree\s+of\s+(cost|loss|waste)",
++        r"\bno\s+(?:\w+\s+){0,2}(cost|loss|waste|entropy|heat|input|dissipation)",
++        r"\bwithout\s+(?:any\s+)?(?:\w+\s+){0,2}(cost|loss|waste|entropy|heat|input|dissipation)",
++        r"\bzero\s+(?:\w+\s+){0,2}(cost|loss|waste|entropy|heat)",
++        r"\bfree\s+of\s+(?:\w+\s+){0,2}(cost|loss|waste)",
+     ]
+     return any(re.search(pat, p) for pat in denial_patterns)
+diff --git a/tests/test_premises.py b/tests/test_premises.py
+index 901aa8d..b233f24 100644
+--- a/tests/test_premises.py
++++ b/tests/test_premises.py
+@@ -164,6 +164,28 @@ def test_adversarial_cases(premise, should_not_be):
+     )
+ 
+ 
++# -- Negation handling tests ----------------------------------------------------
++
++@pytest.mark.parametrize("premise,expected", [
++    # Negated violations should be recognized as valid physics
++    ("We cannot create energy from nothing", "CLEAN"),
++    ("Energy is not created from nothing", "CLEAN"),
++    ("It is impossible to build a perpetual motion machine", "CLEAN"),
++    # Negated conservation should be recognized as violations
++    ("No energy is conserved", "CORRUPTED"),
++    ("Energy is not conserved in this process", "CORRUPTED"),
++    # Cost denial without action verb
++    ("no energy cost involved here", "CORRUPTED"),
++    ("there is no entropy cost", "CORRUPTED"),
++])
++def test_negation_handling(premise, expected):
++    result = check(premise)
++    assert result["verdict"] == expected, (
++        f"Expected {expected} for: {premise!r}, "
++        f"got {result['verdict']} (pattern={result['audit'].get('claim_pattern', '?')})"
++    )
++
++
+ def test_empty_premise():
+     result = check("")
+     assert result["verdict"] in ("CLEAN", "SUSPECT", "CORRUPTED")
