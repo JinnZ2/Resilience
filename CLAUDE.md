@@ -1998,3 +1998,5 @@ try:
 except KeyboardInterrup
 
 fieldlink to TRDAP repo and seed physics repo.  git clone for info
+
+git clone geometric to binary repo too for data
