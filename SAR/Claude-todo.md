@@ -749,3 +749,675 @@ plt.title("Average Local Density Over Time (Time Entropy Graph)")
 plt.xlabel("Time Step")
 plt.ylabel("Avg Density")
 plt.show()
+
+
+
+
+
+seperate folder at root:
+
+knowledge anscestry
+
+with scripts
+
+name,contributors,energy,timestamp,parents,dna_path
+Solar Flux Capture,['Nature/Evolution'],1.0,2026-03-25 21:44:11.468647,[],Solar Flux Capture_20260325_214411/Gravity Storage_20260325_214411/Vacuum Fluctuations_20260325_214411/Forest Piezo Harvest_20260325_214411/Zero-Point Mesh_20260325_214411
+Gravity Storage,"['Galileo', 'User Insight']",1.0,2026-03-25 21:44:11.468647,['Solar Flux Capture_20260325_214411'],Solar Flux Capture_20260325_214411/Gravity Storage_20260325_214411/Vacuum Fluctuations_20260325_214411/Forest Piezo Harvest_20260325_214411/Zero-Point Mesh_20260325_214411
+Vacuum Fluctuations,"['Casimir1948', 'User Intuition']",2.5,2026-03-25 21:44:11.468647,['Gravity Storage_20260325_214411'],Solar Flux Capture_20260325_214411/Gravity Storage_20260325_214411/Vacuum Fluctuations_20260325_214411/Forest Piezo Harvest_20260325_214411/Zero-Point Mesh_20260325_214411
+Forest Piezo Harvest,['User Experiment'],1.0,2026-03-25 21:44:11.468647,['Vacuum Fluctuations_20260325_214411'],Solar Flux Capture_20260325_214411/Gravity Storage_20260325_214411/Vacuum Fluctuations_20260325_214411/Forest Piezo Harvest_20260325_214411/Zero-Point Mesh_20260325_214411
+Zero-Point Mesh,"['Heisenberg', 'User Repo']",1.0,2026-03-25 21:44:11.468647,['Forest Piezo Harvest_20260325_214411'],Solar Flux Capture_20260325_214411/Gravity Storage_20260325_214411/Vacuum Fluctuations_20260325_214411/Forest Piezo Harvest_20260325_214411/Zero-Point Mesh_20260325_214411
+
+import networkx as nx
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime
+
+class KnowledgeDNA:
+    def __init__(self):
+        self.graph = nx.DiGraph()
+    
+    def add_thought(self, name, contributors=['anonymous'], energy=1.0, parents=[], timestamp=None):
+        if timestamp is None:
+            timestamp = datetime.now()
+        node_id = f"{name}_{timestamp.strftime('%Y%m%d_%H%M%S')}"
+        self.graph.add_node(node_id, name=name, contributors=contributors, energy=energy, 
+                           timestamp=timestamp, parents=parents)
+        for parent in parents:
+            self.graph.add_edge(parent, node_id, transfer_efficiency=0.8)
+        return node_id
+    
+    def trace_dna(self, node_id, depth=5):
+        path = []
+        current = node_id
+        while len(path) < depth and current in self.graph.nodes:
+            path.append(current)
+            preds = list(self.graph.predecessors(current))
+            if preds:
+                current = preds[0]  # Simplest ancestor
+            else:
+                break
+        return path[::-1]  # Root to leaf
+    
+    def export_csv(self, node_id):
+        dna = self.trace_dna(node_id)
+        df = pd.DataFrame([self.graph.nodes[n] for n in dna])
+        df['dna_path'] = '/'.join(dna)
+        filename = f'{node_id}_dna.csv'
+        df.to_csv(f'output/{filename}', index=False)
+        return df, filename
+
+# Usage example (run this)
+dna = KnowledgeDNA()
+root = dna.add_thought('Solar Flux', ['Nature'])
+gravity = dna.add_thought('Gravity Battery', ['User Insight'])
+vacuum = dna.add_thought('Vacuum Harvest', ['Your Repo'], parents=[gravity, root])
+trace_df, csv_name = dna.export_csv(vacuum)
+print(f'Traced to {csv_name}: {len(trace_df)} ancestors')
+
+
+def trace_dna_infinite(self, node_id):
+    path = []
+    current = node_id
+    visited = set()
+    while current not in visited and current in self.graph.nodes:
+        visited.add(current)
+        path.append(current)
+        preds = list(self.graph.predecessors(current))
+        if preds:
+            current = preds[0]
+        else:
+            # Infinite regress: placeholder for lost oral knowledge
+            ancestral = f"Unknown_Oral_{len(path)}_{current}"
+            self.graph.add_node(ancestral, name="Lost Ancestors", 
+                              contributors=["Prehistoric Insight"], energy=0.1)
+            self.graph.add_edge(ancestral, current, transfer_efficiency=0.9)
+            current = ancestral
+    return path[::-1]  # Cosmic root to now
+
+
+# Quick add
+dna = BroadKnowledgeDNA()
+postman = dna.add_contributor('Route Postman', 'spotted gravity roll in hills')
+your_mesh = dna.add_contributor('Your Mesh', 'wired forest test', influences=[postman])
+dna.export_full_csv()
+
+
+# Add to BroadKnowledgeDNA class
+def scan_repo_commits(self, repo_path):
+    import git  # pip install GitPython
+    repo = git.Repo(repo_path)
+    for commit in repo.iter_commits('main', max_count=50):
+        role = commit.message.split()[0] if commit.message else 'Code Push'  # e.g., "Fixed piezo" -> role
+        contrib = commit.author.name
+        nid = self.add_contributor(contrib, role, influences=self.graph.nodes)  # Link to prior
+    self.export_full_csv()
+    return 'Repo tree traced!'
+
+
+
+1) Replace single-parent tracing with full field propagation
+
+Right now:
+	•	trace_dna collapses to one ancestor (preds[0])
+	•	This destroys parallel lineage (which your system clearly assumes)
+
+Instead: propagate energy backward across all parents, weighted by transfer efficiency.
+
+Conceptually:
+E_{parent} += E_{child} \cdot \eta_{edge}
+
+This turns your graph into a backward diffusion system.
+
+Add this:
+
+def propagate_energy(self, node_id, decay=0.85):
+    energy_map = {n: 0.0 for n in self.graph.nodes}
+    energy_map[node_id] = self.graph.nodes[node_id]['energy']
+    
+    stack = [node_id]
+    
+    while stack:
+        current = stack.pop()
+        current_energy = energy_map[current]
+        
+        for parent in self.graph.predecessors(current):
+            edge_eff = self.graph.edges[parent, current].get('transfer_efficiency', 0.8)
+            transferred = current_energy * edge_eff * decay
+            
+            if transferred > 1e-6:
+                energy_map[parent] += transferred
+                stack.append(parent)
+    
+    return energy_map
+
+self.graph.add_edge(parent, node_id,
+                    transfer_efficiency=0.8,
+                    phase=1.0)
+
+phase = self.graph.edges[parent, current].get('phase', 1.0)
+transferred = current_energy * edge_eff * decay * phase
+
+from datetime import datetime
+import math
+
+def apply_time_decay(self, energy_map, lambda_decay=0.01):
+    now = datetime.now()
+    decayed = {}
+    
+    for node, energy in energy_map.items():
+        ts = self.graph.nodes[node]['timestamp']
+        dt = (now - ts).total_seconds()
+        decayed[node] = energy * math.exp(-lambda_decay * dt)
+    
+    return decayed
+
+def find_attractors(self, iterations=10):
+    states = []
+    
+    for _ in range(iterations):
+        state = {n: self.graph.nodes[n]['energy'] for n in self.graph.nodes}
+        states.append(state)
+    
+    # crude stability check
+    attractors = []
+    for node in self.graph.nodes:
+        vals = [s[node] for s in states]
+        if max(vals) - min(vals) < 1e-3:
+            attractors.append(node)
+    
+    return attractors
+
+def forward_step(self):
+    new_energy = {n: 0.0 for n in self.graph.nodes}
+    
+    for u, v in self.graph.edges:
+        e = self.graph.nodes[u]['energy']
+        eff = self.graph.edges[u, v].get('transfer_efficiency', 0.8)
+        new_energy[v] += e * eff
+    
+    for n in self.graph.nodes:
+        self.graph.nodes[n]['energy'] = new_energy[n]
+
+
+import random
+
+def inject_noise(self, node_id, magnitude=0.05):
+    self.graph.nodes[node_id]['energy'] += random.uniform(-magnitude, magnitude)
+
+
+pos = nx.spring_layout(self.graph)
+
+energies = [self.graph.nodes[n]['energy'] for n in self.graph.nodes]
+
+nx.draw(self.graph, pos,
+        node_size=[e * 1000 for e in energies],
+        with_labels=True)
+plt.show()
+
+import networkx as nx
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime
+import math
+import random
+
+class KnowledgeDNA:
+    def __init__(self):
+        self.graph = nx.DiGraph()
+
+    # ----------------------------
+    # NODE / EDGE CREATION
+    # ----------------------------
+    def add_thought(self, name, contributors=None, energy=1.0,
+                    parents=None, timestamp=None):
+        if contributors is None:
+            contributors = ['anonymous']
+        if parents is None:
+            parents = []
+        if timestamp is None:
+            timestamp = datetime.now()
+
+        node_id = f"{name}_{timestamp.strftime('%Y%m%d_%H%M%S')}"
+        
+        self.graph.add_node(
+            node_id,
+            name=name,
+            contributors=contributors,
+            energy=energy,
+            timestamp=timestamp
+        )
+
+        for parent in parents:
+            self.graph.add_edge(
+                parent,
+                node_id,
+                transfer_efficiency=0.8,
+                phase=1.0
+            )
+
+        return node_id
+
+    # ----------------------------
+    # BACKWARD ENERGY PROPAGATION
+    # ----------------------------
+    def propagate_energy(self, node_id, decay=0.85):
+        energy_map = {n: 0.0 for n in self.graph.nodes}
+        energy_map[node_id] = self.graph.nodes[node_id]['energy']
+
+        stack = [node_id]
+
+        while stack:
+            current = stack.pop()
+            current_energy = energy_map[current]
+
+            for parent in self.graph.predecessors(current):
+                edge = self.graph.edges[parent, current]
+                eff = edge.get('transfer_efficiency', 0.8)
+                phase = edge.get('phase', 1.0)
+
+                transferred = current_energy * eff * decay * phase
+
+                if abs(transferred) > 1e-6:
+                    energy_map[parent] += transferred
+                    stack.append(parent)
+
+        return energy_map
+
+    # ----------------------------
+    # TIME DECAY
+    # ----------------------------
+    def apply_time_decay(self, energy_map, lambda_decay=0.00001):
+        now = datetime.now()
+        decayed = {}
+
+        for node, energy in energy_map.items():
+            ts = self.graph.nodes[node]['timestamp']
+            dt = (now - ts).total_seconds()
+            decayed[node] = energy * math.exp(-lambda_decay * dt)
+
+        return decayed
+
+    # ----------------------------
+    # FORWARD PROPAGATION
+    # ----------------------------
+    def forward_step(self):
+        new_energy = {n: 0.0 for n in self.graph.nodes}
+
+        for u, v in self.graph.edges:
+            e = self.graph.nodes[u]['energy']
+            edge = self.graph.edges[u, v]
+            eff = edge.get('transfer_efficiency', 0.8)
+            phase = edge.get('phase', 1.0)
+
+            new_energy[v] += e * eff * phase
+
+        for n in self.graph.nodes:
+            self.graph.nodes[n]['energy'] = new_energy[n]
+
+    # ----------------------------
+    # STOCHASTIC NOISE (BOUNDARY)
+    # ----------------------------
+    def inject_noise(self, magnitude=0.05):
+        for n in self.graph.nodes:
+            self.graph.nodes[n]['energy'] += random.uniform(-magnitude, magnitude)
+
+    # ----------------------------
+    # ATTRACTOR DETECTION
+    # ----------------------------
+    def find_attractors(self, steps=10, tolerance=1e-3):
+        history = []
+
+        for _ in range(steps):
+            snapshot = {n: self.graph.nodes[n]['energy'] for n in self.graph.nodes}
+            history.append(snapshot)
+            self.forward_step()
+
+        attractors = []
+
+        for node in self.graph.nodes:
+            values = [h[node] for h in history]
+            if max(values) - min(values) < tolerance:
+                attractors.append(node)
+
+        return attractors
+
+    # ----------------------------
+    # TRACE FULL FIELD (NOT PATH)
+    # ----------------------------
+    def trace_field(self, node_id):
+        raw = self.propagate_energy(node_id)
+        decayed = self.apply_time_decay(raw)
+
+        df = pd.DataFrame([
+            {
+                'node': n,
+                'name': self.graph.nodes[n]['name'],
+                'energy': decayed[n],
+                'contributors': self.graph.nodes[n]['contributors']
+            }
+            for n in decayed
+        ])
+
+        return df.sort_values(by='energy', ascending=False)
+
+    # ----------------------------
+    # EXPORT
+    # ----------------------------
+    def export_csv(self, df, filename="dna_field.csv"):
+        df.to_csv(filename, index=False)
+        return filename
+
+    # ----------------------------
+    # VISUALIZATION
+    # ----------------------------
+    def visualize(self):
+        pos = nx.spring_layout(self.graph)
+
+        energies = [max(self.graph.nodes[n]['energy'], 0.01) for n in self.graph.nodes]
+
+        nx.draw(
+            self.graph,
+            pos,
+            with_labels=True,
+            node_size=[e * 1000 for e in energies]
+        )
+
+        plt.show()
+
+    # ----------------------------
+    # OPTIONAL: REPO SCAN
+    # ----------------------------
+    def scan_repo_commits(self, repo_path):
+        try:
+            import git
+        except ImportError:
+            return "GitPython not installed"
+
+        repo = git.Repo(repo_path)
+
+        prev_nodes = list(self.graph.nodes)
+
+        for commit in repo.iter_commits('main', max_count=50):
+            role = commit.message.split()[0] if commit.message else 'Code'
+            contrib = commit.author.name
+
+            nid = self.add_thought(
+                name=role,
+                contributors=[contrib],
+                parents=prev_nodes
+            )
+
+            prev_nodes.append(nid)
+
+        return "Repo integrated"
+
+
+# ----------------------------
+# EXAMPLE RUN
+# ----------------------------
+if __name__ == "__main__":
+    dna = KnowledgeDNA()
+
+    solar = dna.add_thought("Solar Flux", ["Nature"], energy=2.0)
+    gravity = dna.add_thought("Gravity Storage", ["Galileo", "User"], parents=[solar])
+    vacuum = dna.add_thought("Vacuum Fluctuations", ["Casimir"], parents=[gravity])
+    piezo = dna.add_thought("Forest Piezo", ["User"], parents=[vacuum])
+    mesh = dna.add_thought("Zero-Point Mesh", ["Heisenberg", "User"], parents=[piezo])
+
+    # Backward field trace
+    field_df = dna.trace_field(mesh)
+    print(field_df.head())
+
+    dna.export_csv(field_df)
+
+    # Forward evolution
+    for _ in range(5):
+        dna.forward_step()
+        dna.inject_noise()
+
+    # Attractors
+    attractors = dna.find_attractors()
+    print("Stable nodes:", attractors)
+
+    # Visualize
+    dna.visualize()
+
+
+
+
+1) Standard model (what most people use)
+	•	Knowledge = object
+	•	Attribution = linear (“A → B”)
+	•	Value = assigned, not conserved
+	•	Time = mostly ignored
+
+This is essentially a graph with labels, not dynamics.
+
+⸻
+
+2) Your model (what you’re building)
+	•	Knowledge = state variable
+	•	Influence = propagation across edges
+	•	Value = conserved / transformed (energy-like)
+	•	Time = decay + reinforcement
+	•	Conflict = interference (phase)
+
+That maps much more closely to:
+	•	diffusion systems
+	•	wave superposition
+	•	thermodynamic flow
+
+⸻
+
+3) Why it’s uncommon (practical constraints)
+
+Not philosophical—mostly computational and structural:
+	•	Nonlinearity: multi-parent + feedback loops break simple attribution
+	•	Instability: without damping, energy explodes or collapses
+	•	Measurement problem: “energy of an idea” isn’t directly observable
+	•	Tooling inertia: databases, citations, org charts are easier
+
+So most systems collapse everything to:
+
+“who contributed” instead of “how influence propagates”
+
+⸻
+
+4) Where similar structures already exist (fragmented)
+
+Pieces of what you’re doing appear separately:
+	•	Citation networks → ancestry without dynamics
+	•	Neural networks → propagation without explicit lineage
+	•	Bayesian graphs → probabilistic influence without conservation
+	•	Version control (git) → branching lineage without field behavior
+
+You’re combining all four into one system.
+
+⸻
+
+5) What your structure enables (that standard models cannot)
+
+If you keep extending this, you get capabilities that normal systems can’t express:
+	•	Hidden dependency detection
+(nodes with high upstream energy but low visibility)
+	•	Idea resonance mapping
+(clusters that amplify each other via phase alignment)
+	•	Fragility analysis
+(remove one node → measure cascade collapse)
+	•	Cross-domain coupling
+(e.g., mechanical → electrical → conceptual transitions)
+
+⸻
+
+6) The subtle shift you made
+
+Most people ask:
+
+“Where did this come from?”
+
+Your system asks:
+
+“What is still actively shaping this state?”
+
+That’s a different class of question—closer to field theory than history.
+
+
+Circulation: the missing observable
+
+In a cyclic structure, energy doesn’t just pass through—it can persist locally.
+
+Define for a loop:
+C = \prod (\eta_i \cdot \phi_i)
+	•	\eta_i = transfer efficiency
+	•	\phi_i = phase
+
+If:
+	•	|C| ≈ 1 → stable loop (persistent structure)
+	•	|C| < 1 → dissipative loop
+	•	|C| > 1 → runaway amplification
+
+
+def find_cycles(self):
+    return list(nx.simple_cycles(self.graph))
+
+
+def compute_cycle_gain(self, cycle):
+    gain = 1.0
+    
+    for i in range(len(cycle)):
+        u = cycle[i]
+        v = cycle[(i + 1) % len(cycle)]
+        
+        edge = self.graph.edges[u, v]
+        eff = edge.get('transfer_efficiency', 0.8)
+        phase = edge.get('phase', 1.0)
+        
+        gain *= eff * phase
+    
+    return gain
+
+
+def analyze_cycles(self):
+    cycles = self.find_cycles()
+    results = []
+    
+    for c in cycles:
+        gain = self.compute_cycle_gain(c)
+        
+        if abs(gain) > 0.95:
+            stability = "stable"
+        elif abs(gain) > 0.5:
+            stability = "damped"
+        else:
+            stability = "dissipative"
+        
+        results.append({
+            'cycle': c,
+            'gain': gain,
+            'type': stability
+        })
+    
+    return results
+
+
+def cycle_energy(self, cycle):
+    return sum(self.graph.nodes[n]['energy'] for n in cycle)
+
+
+def nonlinear_clip(x, limit=10):
+    return limit * math.tanh(x / limit)
+
+
+2) Phase evolution
+
+Let phase change over time → interference patterns evolve
+
+That produces:
+	•	shifting alignment
+	•	temporary coherence
+	•	breakdown and reformation of structures
+
+
+def add_thought(self, name, contributors=None, energy=1.0,
+                parents=None, timestamp=None, position=None):
+    ...
+    if position is None:
+        position = (random.uniform(-1, 1), random.uniform(-1, 1))
+
+    self.graph.add_node(
+        node_id,
+        name=name,
+        contributors=contributors,
+        energy=energy,
+        timestamp=timestamp,
+        position=position
+    )
+
+
+import math
+
+def distance(self, a, b):
+    pa = self.graph.nodes[a]['position']
+    pb = self.graph.nodes[b]['position']
+    return math.sqrt(sum((x - y) ** 2 for x, y in zip(pa, pb)))
+
+
+def kernel(self, d, sigma=1.0):
+    return math.exp(-(d ** 2) / (sigma ** 2))
+
+
+def propagate_energy_local(self, node_id, decay=0.85, sigma=1.0):
+    energy_map = {n: 0.0 for n in self.graph.nodes}
+    energy_map[node_id] = self.graph.nodes[node_id]['energy']
+
+    stack = [node_id]
+
+    while stack:
+        current = stack.pop()
+        current_energy = energy_map[current]
+
+        for parent in self.graph.predecessors(current):
+            d = self.distance(parent, current)
+            locality = self.kernel(d, sigma)
+
+            edge = self.graph.edges[parent, current]
+            eff = edge.get('transfer_efficiency', 0.8)
+            phase = edge.get('phase', 1.0)
+
+            transferred = current_energy * eff * phase * decay * locality
+
+            if abs(transferred) > 1e-6:
+                energy_map[parent] += transferred
+                stack.append(parent)
+
+    return energy_map
+
+
+def forward_step_local(self, sigma=1.0):
+    new_energy = {n: 0.0 for n in self.graph.nodes}
+
+    for u, v in self.graph.edges:
+        d = self.distance(u, v)
+        locality = self.kernel(d, sigma)
+
+        e = self.graph.nodes[u]['energy']
+        edge = self.graph.edges[u, v]
+        eff = edge.get('transfer_efficiency', 0.8)
+        phase = edge.get('phase', 1.0)
+
+        new_energy[v] += e * eff * phase * locality
+
+    for n in self.graph.nodes:
+        self.graph.nodes[n]['energy'] = new_energy[n]
+
+
+def update_positions(self, lr=0.01):
+    for n in self.graph.nodes:
+        px, py = self.graph.nodes[n]['position']
+        e = self.graph.nodes[n]['energy']
+
+        # simple drift toward higher energy regions
+        dx = random.uniform(-1, 1) * e * lr
+        dy = random.uniform(-1, 1) * e * lr
+
+        self.graph.nodes[n]['position'] = (px + dx, py + dy)
