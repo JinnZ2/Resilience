@@ -663,4 +663,89 @@ class MoebiusSwarm(SwarmBridge):
 
 
 
+another helpful sim to add:
 
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.spatial import KDTree
+
+# --- Simulation Parameters ---
+num_cats = 5000
+arena_radius = 50
+golden_angle = 2 * np.pi * (1 - 1/((1 + 5**0.5)/2)))
+time_steps = 200
+cluster_strength = 0.05
+entropy_threshold = 2.0
+density_radius = 2.0
+critical_density = 15.0  # Entropy event threshold
+failure_rate = 0.2       # Probability of stall/vibration
+global_drift = np.array([0.01, -0.005])  # Drift vector per step
+
+# --- Initialize positions in Nautilus spiral ---
+positions = np.zeros((num_cats, 2))
+for i in range(num_cats):
+    r = np.sqrt(i)
+    theta = i * golden_angle
+    positions[i] = [r * np.cos(theta), r * np.sin(theta)]
+
+np.random.seed(42)
+
+# --- Plot Setup ---
+fig, ax = plt.subplots(figsize=(8,8))
+ax.set_xlim(-arena_radius, arena_radius)
+ax.set_ylim(-arena_radius, arena_radius)
+ax.set_title("Parallel-Field Sensor Simulation: Cat Clusters & Entropy")
+scatter = ax.scatter(positions[:,0], positions[:,1], s=2, c='blue', alpha=0.7)
+
+# --- Track global density over time ---
+avg_density_history = []
+
+for t in range(time_steps):
+    # --- Update positions with local interactions ---
+    for i in range(num_cats):
+        neighbors = np.random.choice(num_cats, size=5, replace=False)
+        for j in neighbors:
+            diff = positions[j] - positions[i]
+            dist = np.linalg.norm(diff)
+            if dist < entropy_threshold:
+                positions[i] -= cluster_strength * diff / dist
+            else:
+                positions[i] += cluster_strength * diff / dist * 0.1
+
+    # --- Apply global arena drift ---
+    positions += global_drift
+
+    # --- Keep cats within arena ---
+    norms = np.linalg.norm(positions, axis=1)
+    mask = norms > arena_radius
+    positions[mask] = positions[mask] / norms[mask][:,None] * arena_radius
+
+    # --- Density calculation ---
+    tree = KDTree(positions)
+    densities = np.array([len(tree.query_ball_point(pos, density_radius)) for pos in positions])
+    avg_density_history.append(np.mean(densities))
+
+    # --- Thermal / Entropy Failure ---
+    for i in range(num_cats):
+        if densities[i] > critical_density:
+            if np.random.rand() < failure_rate:
+                # Entropy event: small random displacement
+                positions[i] += np.random.normal(0, 0.5, 2)
+                # Optional: map to red color manually
+                # scatter.set_color('red') could be extended for per-cat coloring
+
+    # --- Update plot every 20 steps ---
+    if t % 20 == 0:
+        scatter.set_offsets(positions)
+        scatter.set_array(densities)
+        plt.pause(0.01)
+
+plt.show()
+
+# --- Plot average density over time ---
+plt.figure(figsize=(8,4))
+plt.plot(avg_density_history, color='orange')
+plt.title("Average Local Density Over Time (Time Entropy Graph)")
+plt.xlabel("Time Step")
+plt.ylabel("Avg Density")
+plt.show()
