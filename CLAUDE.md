@@ -205,3 +205,97 @@ No GitHub Actions, no automated pipelines, no pre-commit hooks, no linter config
 - Documentation files are substantial and interconnected — update cross-references when renaming or moving content
 - The `sim/` directory is the active codebase; root-level `.md` files are documentation/theory
 - Many modules are standalone domain models — adding new ones does not require modifying existing imports
+
+## Ecosystem Field Links
+
+This repository connects to a broader ecosystem of repos. Each handles a distinct layer of the same underlying system.
+
+### Linked Repositories
+
+| Repository | Description | Connection to Resilience |
+|------------|-------------|--------------------------|
+| [JinnZ2/TRDAP](https://github.com/JinnZ2/TRDAP) | Transport Registration Data Access Protocol — decentralized resource discovery over mesh networks (LoRa, Meshtastic, ad-hoc WiFi) | Transport/logistics layer; seed protocol for identity + routing in degraded networks |
+| [JinnZ2/Seed-physics](https://github.com/JinnZ2/Seed-physics) | 40-bit seed expansion — octahedral encoding, deterministic field reconstruction, mesh networking | Physics substrate; seed identity system underpinning spatial coupling and field-based coordination |
+| [JinnZ2/Geometric-to-Binary-Computational-Bridge](https://github.com/JinnZ2/Geometric-to-Binary-Computational-Bridge) | Geometric intuition → binary code via silicon's octahedral coordination (8 states = 3 bits) | Computational bridge; GEIS encoding system, geometric solver, SIMD optimization |
+| [JinnZ2/PhysicsGuard](https://github.com/JinnZ2/PhysicsGuard) | Physics-grounded logic verification — detects corrupted premises via conservation law checking | Layer 3 tool; validates claims against thermodynamic constraints |
+
+### Cross-Repo Architecture
+
+```
+Geometric-to-Binary          Seed-physics              TRDAP
+(encoding substrate)         (field physics)           (transport protocol)
+        │                         │                         │
+        └──── octahedral ────────►│                         │
+              states              │                         │
+                                  ├── seed protocol v1-v4 ──►│
+                                  │   (13-21 byte packets)   │
+                                  │                         ├── mesh networking
+                                  │                         ├── rural hub deployment
+                                  │                         └── ARK / Stranded Bible
+                                  │
+                        Resilience (this repo)
+                        ├── sim/ — city-scale modeling
+                        ├── food↔energy↔logistics coupling
+                        └── thermodynamic institutional analysis
+                                  │
+                            PhysicsGuard
+                            (constraint verification)
+```
+
+### Seed Protocol Summary (from Seed-physics + TRDAP)
+
+The seed protocol provides identity, routing, and field reconstruction for degraded networks:
+
+- **Seed**: 6 proportional amplitudes across octahedral vertices (40 bits, 5 bytes encoded)
+- **Expansion**: Deterministic — `expand_seed(seed)` produces identical shells everywhere
+- **Identity**: `seed_distance(a, b) < threshold` defines same-entity relationship
+- **Packets**: v1 = 13 bytes, v2 = 21 bytes (radio-safe, CRC16 verified)
+- **Routing**: Gradient descent in seed-space — packets move "downhill" toward target seed
+- **Recovery**: Seed alone is sufficient to rebuild full structure (stateless reconstruction)
+
+### Spatial Coupling Cost Function
+
+```
+J = α · D_seed(S_i, S_j) + β · D_space(x_i, x_j) + γ · ΔE
+```
+
+Where D_seed = L1 distance in 6D, D_space = Euclidean, ΔE = energy mismatch. Drives: similar seeds → move closer, dissimilar seeds → separate.
+
+## Todo: Seed Protocol Integration
+
+Implement seed protocol modules for this repo. Target: stdlib-only where possible, NumPy for field math.
+
+### Planned Modules
+
+1. **`sim/seed_protocol_v1.py`** — Orbital seed transport + reconstruction (13-byte packets)
+2. **`sim/seed_protocol_v2.py`** — Spatial coupling extension (21-byte packets, anchor grid + position)
+3. **`sim/seed_agent_tcp.py`** — Seed-native agents over TCP (depends on agent framework)
+4. **`sim/seed_udp.py`** — Minimal UDP broadcast for discovery + recovery
+5. **Multi-node simulation harness** — 40-node in-process simulation with convergence metrics
+6. **Real UDP mesh** — Range-limited communication with packet loss + jitter
+7. **LAN multicast mesh** — Multi-machine via IP multicast (224.1.1.1)
+
+### Protocol Packet Format (v2, 21 bytes)
+
+```
+Offset  Size  Field
+------  ----  ------------------------------
+0       1     Version (uint8)
+1       1     Frame ID (0x01=Earth, 0x02=Local mesh, 0x03=Inertial)
+2       1     Flags (bit 0=authoritative, 1=sync, 2=relay, 3=explore, 4=high-energy)
+3       5     Seed (5 × uint8, 6th implicit: p6 = 1 − Σp1..p5)
+8       1     Energy Hint (uint8, log-scaled)
+9       2     Epoch (uint16, monotonic counter)
+11      2     Anchor Cell (uint16, coarse grid)
+13      3     Offset Vector (int8 × 3, local position)
+16      3     Neighbor Hint (compressed directional bias)
+19      2     CRC16 (lower 16 bits of CRC32)
+```
+
+### Key Constraints
+
+- `expand_seed(seed)` must be deterministic and identical everywhere
+- Energy conservation: `sum(S_i) = E` exactly at every shell
+- Causality: only inner shells influence outer shells
+- Packet ≤ 21 bytes (radio-safe for LoRa/Meshtastic)
+- Stateless reconstruction from seed alone
