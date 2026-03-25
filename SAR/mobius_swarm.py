@@ -52,18 +52,31 @@ class MoebiusSwarm:
     def tension_stabilize(self, vector_in: np.ndarray) -> np.ndarray:
         """Apply φ + κ*anti-φ tension: prevents cascade failure."""
         # Normalize input vector
-        vector_norm = vector_in / np.linalg.norm(vector_in)
-        
-        # Möbius correction: tension between competing invariants
-        vector_tensioned = self.P_tension @ vector_norm
-        norm = np.linalg.norm(vector_tensioned)
-        
-        return vector_tensioned / norm if norm > 1e-9 else vector_norm
+        norm_in = np.linalg.norm(vector_in)
+        if norm_in < 1e-9:
+            return vector_in
+        vector_norm = vector_in / norm_in
+
+        # Project first 2 components through tension operator,
+        # pass remaining components through unchanged.
+        # The projector operates on the [health, alt] subspace;
+        # battery, thermal, wind are preserved.
+        v2 = vector_norm[:2]
+        v_rest = vector_norm[2:]
+        v2_tensioned = self.P_tension @ v2
+        norm2 = np.linalg.norm(v2_tensioned)
+        if norm2 > 1e-9:
+            v2_tensioned = v2_tensioned / norm2 * np.linalg.norm(v2)
+        vector_tensioned = np.concatenate([np.real(v2_tensioned), v_rest])
+        norm_out = np.linalg.norm(vector_tensioned)
+
+        return vector_tensioned / norm_out if norm_out > 1e-9 else vector_norm
 
     def phi_embedding(self, psi: np.ndarray) -> np.ndarray:
-        """Geometric coordinates with φ-weighting."""
+        """Geometric coordinates with φ-weighting on first 2 components."""
+        v2 = psi[:2] if len(psi) >= 2 else np.pad(psi, (0, 2 - len(psi)))
         phi_weight = np.array([1.0, PHI_INV])
-        return np.real(phi_weight * np.outer(psi, np.conj(psi)).flatten())
+        return np.real(phi_weight * v2)
 
     def geometric_coherence(self, coords: np.ndarray) -> float:
         """φ-invariant coherence under tension."""
@@ -91,8 +104,8 @@ class MoebiusSwarm:
         self.nodes.append((x, y, vector_stable[0]))
         self.drone_health[drone_id] = vector_stable[0]
         
-        # Track coherence (your QEC metric)
-        coords = np.vstack([self.phi_embedding(v) for v in [vector_stable]])
+        # Track coherence (QEC metric)
+        coords = np.array([self.phi_embedding(v) for v in [vector_stable]])
         self.coherence = self.geometric_coherence(coords)
         self.tension_history.append(self.coherence)
         
@@ -132,7 +145,7 @@ class SeaFrostMoebius(MoebiusSwarm):
         self.fire_epicenter = None
         self.stage = 0  # 0=RECON, 1=CO2, 2=LN2
 
-    def process_fire_mission(self, drone_id: int, thermal_ Dict) -> Dict:
+    def process_fire_mission(self, drone_id: int, thermal_data: Dict) -> Dict:
         """SeaFrost wolf pack with Möbius protection."""
         # Maritime fire vector
         telemetry = [
@@ -172,7 +185,8 @@ def moebius_blizzard_test():
                 
                 result = swarm.process_drone_telemetry(drone_id, telemetry)
                 if result['survivor']:
-                    print(f"T={t}: HIT @ {result['alloc']:.1f},{result['alloc1']:.1f} coh={result['coherence']:.2f}")
+                    ax, ay = result['alloc']
+                    print(f"T={t}: HIT @ {ax:.1f},{ay:.1f} coh={result['coherence']:.2f}")
             
             if t % 100 == 0:
                 print(f"T={t}: Coherence={swarm.coherence:.2f}, Nodes={len(swarm.nodes)}")
@@ -193,7 +207,9 @@ def seafrost_moebius_test():
     for drone_id in range(4):
         result = seafrost.process_fire_mission(drone_id, thermal_spike)
         role = ['ALPHA', 'BETA1', 'BETA2', 'GAMMA'][drone_id]
-        print(f"  {role}: {result['payload']} coh={result['coherence']:.2f} @ {result['alloc']}")
+        payload = result.get('payload', 'SCAN')
+        ax, ay = result['alloc']
+        print(f"  {role}: {payload} coh={result['coherence']:.2f} @ ({ax:.1f}, {ay:.1f})")
     
     print(f"\n✅ TENSION PROTECTED: κ={seafrost.kappa} maintains {seafrost.coherence:.2f} coherence")
 

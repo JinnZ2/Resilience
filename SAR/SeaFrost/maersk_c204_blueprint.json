@@ -1,0 +1,35 @@
+{
+  "vessel": "Maersk Charlie-204",
+  "deck_layout": {
+    "length": 400,
+    "beam": 60,
+    "height": 25
+  },
+  "drone_launcher": [
+    20,
+    10,
+    15
+  ],
+  "cargo_manifest": [
+    {
+      "id": "C-204",
+      "position": [
+        120,
+        25,
+        5
+      ],
+      "cargo_type": "lithium_battery",
+      "fire_risk": 0.95
+    },
+    {
+      "id": "C-205",
+      "position": [
+        122,
+        27,
+        5
+      ],
+      "cargo_type": "lithium_battery",
+      "fire_risk": 0.7
+    }
+  ]
+}
