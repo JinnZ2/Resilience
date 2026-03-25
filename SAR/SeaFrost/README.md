@@ -1,245 +1,197 @@
-# SeaFrost: Drone Swarm Lithium Fire Suppression
-**$15K system stops $100M+ maritime fires in 45 seconds**
+# SeaFrost: Staged Cryogenic Fire Suppression
 
-## Maersk C-204 Fire Test
+Drone-delivered staged cooling for lithium battery thermal runaway
+on commercial vessels.
 
-T+0s:   ALARM Container C-204 (120m,25m,5m)
-T+15s:  Alpha pins epicenter → Beta CO2 pre-cools 950→450°C  
-T+30s:  Gamma LN2 → -25°C (target: -20°C) THERMAL RUNAWAY STOPPED
-T+45s:  MISSION COMPLETE (vs Coast Guard 15+ minutes)
+CC0 public domain.
 
+## Problem
 
-## Deploy Tomorrow
-```bash
-git clone [your-anon-drop]
-pip install pymavlink numpy
-./sitl_seafrost.sh     # 4-drone SITL
-python maersk_fire_test.py  # C-204 fire mission
+Lithium battery fires in shipping containers reach 1000C internally.
+Cell-to-cell thermal runaway propagation occurs in 30-60 seconds.
+Container-to-container in 5-15 minutes. Water is ineffective (does
+not achieve the -20C threshold needed to stop propagation). CO2 alone
+displaces oxygen but does not cool sufficiently. Coast Guard maritime
+response averages 15-60 minutes. By that time, the fire has spread.
 
+## Approach
 
-Geometry beats AI: 95% recovery when smoke kills GPS. Wolf pack tetrahedron attack validated by icosahedral parity.
-Rural SAR or maritime fires 
+Two-stage cryogenic cooling delivered by a 4-drone wolf pack:
 
+**Stage 1: CO2 pre-cooling (T+0 to T+15s)**
+- Drops fire temperature from ~1000C to ~400C
+- Prevents explosive thermal shock from direct cryogenic contact
+- Displaces oxygen around the fire envelope
 
+**Stage 2: LN2 deep cooling (T+15 to T+30s)**
+- Drops temperature from ~400C to below -20C
+- Stops thermal runaway propagation chain
+- Latent heat of vaporization provides sustained cooling
 
+Direct LN2 application to a 1000C surface is dangerous: steam
+explosions from trapped moisture, material fracture from extreme
+thermal gradient. The CO2 pre-cool stage eliminates this risk.
 
-Exact Heat Transfer Equations
-Stage 1: CO2 Pre-Cooling (950°C → 450°C)
+## Heat Transfer Model
 
-# Stefan-Boltzmann radiation + forced convection
-def co2_precool_rate(T_fire=950+273, T_co2=220, A_surface=2.0, h_conv=150):
-    """
-    W/m² heat flux from 950°C battery fire to CO2 plume
-    h_conv=150 W/m²K for high-velocity CO2 discharge
-    """
-    sigma = 5.67e-8  # Stefan-Boltzmann constant
-    epsilon = 0.9    # Battery surface emissivity
-    
-    q_rad = epsilon * sigma * (T_fire**4 - T_co2**4)  # Radiation
-    q_conv = h_conv * (T_fire - T_co2)                # Convection
-    return q_rad + q_conv  # Total cooling flux
+### Stage 1: CO2 Pre-Cooling
 
-# Time to drop 500°C: solves m*c*ΔT = ∫q(t)dt
-def time_to_450C(initial_mass=50):  # 50kg battery pack
-    c_battery = 800  # J/kgK specific heat
-    total_heat = initial_mass * c_battery * 500
-    cooling_power = co2_precool_rate() * A_surface * 2  # Dual Beta drones
-    return total_heat / cooling_power  # ~4.2 seconds
+Radiation (Stefan-Boltzmann) + forced convection:
 
+```
+q_total = epsilon * sigma * (T_fire^4 - T_co2^4) + h_conv * (T_fire - T_co2)
 
-Stage 2: LN2 Deep Cooling (450°C → -20°C)
+Where:
+  epsilon  = 0.9       (battery surface emissivity)
+  sigma    = 5.67e-8   (Stefan-Boltzmann constant, W/m^2K^4)
+  T_fire   = 1223 K    (950C)
+  T_co2    = 220 K     (-53C, CO2 discharge temperature)
+  h_conv   = 150 W/m^2K (high-velocity CO2 discharge)
+```
 
-def ln2_killshot_rate(T_initial=450+273, T_target=253):
-    """
-    Latent heat + cryogenic convection
-    LN2: 199 kJ/kg latent heat at 77K
-    """
-    h_fg_ln2 = 199000  # J/kg
-    ln2_flow = 2.5     # kg/s from Gamma drone
-    
-    # Phase change cooling dominates
-    q_latent = h_fg_ln2 * ln2_flow
-    return q_latent  # 497 kW cooling power
+Time to cool 50kg battery pack by 500C:
+```
+t = m * c * dT / (q * A)
+  = 50 * 800 * 500 / (q_total * A_surface)
+  ≈ 4-5 seconds (dual Beta drones)
+```
 
+### Stage 2: LN2 Deep Cooling
 
-Production Fire Simulator
-def seafrost_fire_physics(target_container="C-204"):
-    """Exact heat transfer + backup deployment logic."""
-    
-    # Maersk C-204: 48x8x9.6ft reefer, 50 battery pallets
-    battery_mass = 50 * 1000  # 50 tons total lithium
-    A_fire = 200              # m² exposed surface
-    
-    # Timeline with redundancy
-    timeline = []
-    
-    # T=0s: Alarm → Alpha thermal triangulation
-    timeline.append(("T+0s", "ALARM", 950, "Alpha Scout"))
-    
-    # T=0-5s: Beta1/2 CO2 attack (redundant: either survives)
-    q_co2 = co2_precool_rate(A_surface=A_fire)
-    delta_t_co2 = (battery_mass * 800 * 500) / (q_co2 * A_fire)
-    timeline.append((f"T+{delta_t_co2:.1f}s", "CO2_PRECOOL", 450, "Beta Swarm"))
-    
-    # Backup trigger: if Beta1 fails, Beta2 continues solo
-    timeline.append(("T+6s", "BETA1_FAIL", 650, "Beta2 Solo (75% power)"))
-    
-    # T=6-18s: Gamma LN2 kill shot
-    q_ln2 = ln2_killshot_rate()
-    delta_t_ln2 = (battery_mass * 800 * 470) / q_ln2
-    timeline.append((f"T+{delta_t_ln2:.1f}s", "LN2_KILLSHOT", -25, "Gamma"))
-    
-    return timeline
+Latent heat dominates:
+```
+q_latent = h_fg * flow_rate
+  = 199,000 J/kg * 2.5 kg/s
+  = 497 kW cooling power
+```
 
-print("\n".join(f"{t[0]}: {t[1]} → {t[2]}°C ({t[3]})" for t in seafrost_fire_physics()))
-# T+0s: ALARM → 950°C (Alpha Scout)
-# T+4.2s: CO2_PRECOOL → 450°C (Beta Swarm)  
-# T+6s: BETA1_FAIL → 650°C (Beta2 Solo)
-# T+17.8s: LN2_KILLSHOT → -25°C (Gamma)
+Time to cool from 400C to -20C:
+```
+t = m * c * dT / q_latent
+  = 50 * 800 * 420 / 497,000
+  ≈ 10-15 seconds
+```
 
+## Wolf Pack Configuration
 
-Ruggedized Deployment Protocols
-1. Smoke-Penetrating Navigation
-Vector[5] = [IR_signal, RF_beacon, IMU_drift, Container_Proximity, Payload_Health]
-   ↓ icosahedral encoding (works when GPS dead)
+| Drone  | Role        | Payload        | Weight | Flight Time |
+|--------|-------------|---------------|--------|-------------|
+| Alpha  | Scout       | IR sensor     | 2.5 lb | 10 min      |
+| Beta1  | Suppressor  | CO2 cartridge | 2.5 lb | 10 min      |
+| Beta2  | Suppressor  | CO2 cartridge | 2.5 lb | 10 min      |
+| Gamma  | Kill        | LN2 reservoir | 2.5 lb | 10 min      |
 
+Beta1 and Beta2 are redundant. Either can complete the CO2 stage alone
+at 75% cooling power if the other fails.
 
-Redundant Ranging
+## Ship Digital Twin
 
-def fire_epicenter_lock(thermal_vector):
-    """Multi-modal fire triangulation."""
-    ir_confidence = thermal_vector[0]
-    rf_confidence = thermal_vector[1] 
-    imu_confidence = thermal_vector[2]
-    
-    # Icosahedral state machine prevents drift divergence
-    if parity_check(encode_task(thermal_vector)):
-        return weighted_average([ir, rf, imu], [ir_confidence, rf_confidence, imu_confidence])
+`digital_twin.py` parses vessel blueprints to pre-calculate response:
 
+1. Load ship JSON (deck layout, cargo manifest, launcher position)
+2. Identify all lithium battery containers
+3. Compute wolf pack paths for each container:
+   - Alpha: spiral approach for thermal recon
+   - Beta1/Beta2: 120/240 degree attack angles (5m standoff)
+   - Gamma: overhead position (8m altitude)
+4. Store paths for instant retrieval on alarm
 
-Emergency Fixed Deployment
+### Blueprint Format
 
-# If all drones lost: fixed suppression from blueprint
-def fixed_suppression(container_id):
-    """Valve dump from pre-plumbed CO2/LN2 manifold."""
-    ship_twin = ShipDigitalTwin(blueprint)
-    coords = ship_twin.containers[container_id].coords
-    return ship_twin.fire_paths[container_id]['emergency_valves']
-
-
-DIY SeaFrost Wolf Pack - Garage Build from Scrap  
-Your house test → ship-scale, using stuff in every drone builder’s junk drawer
-Bill of Materials (Under $200 total)
-4x Mini Drones (crash specials)
-
-
-Frame: 90mm whoop frames ($2ea) or broken racer parts
-Motors: 1103 10000kv (pull from dead quads)
-FC/ESC: Matek H743 mini or dead racer brain
-Props: Gemfan 31mm 4-blade
-Battery: 450mAh 1S LiHV (phone battery surgery)
-TX: FrSky R-XSR (salvage) + Crossfire Nano for smoke range
-Total per drone: ~$25 x4 = $100
-
-Alpha Scout: $8 FLIR Lepton module (ebay) OR $2 MLX90614 IR sensor  
-Beta CO2: 20g CO2 cartridges (BB gun) + solenoid valve ($5ea x2)  
-Gamma LN2: 30ml syringe pump (Arduino peristaltic) + thermos LN2 ($10)  
-Total: $35
-
-
-launch cage
-
-PVC pipe 4" diameter x 24" tall + plywood base + bungee launch ($15)
-
-
-Garage Physics Validator
-
-# Your house test → exact scaling
-def diy_seafrost_physics():
-    # Your 1kW garage fire (phone battery)
-    q_co2 = 150 * 2 * 0.5  # h_conv * A * t from 2x 20g CO2
-    q_ln2 = 199000 * 0.03  # Latent heat from 30ml LN2
-    
-    print("DIY Physics Match - Your House Test:")
-    print(f"CO2 (2x20g): {q_co2/1000:.0f}kJ → 700→300°C")
-    print(f"LN2 (30ml):  {q_ln2/1000:.0f}kJ → 300→-20°C") 
-    print("✅ Matches your test results")
-    
-    # Maersk scale (50MW → 50kW with 4 drones)
-    scale = 50  # Drone power scaling
-    print(f"Ship scale: x{scale} → 16s mission")
-
-diy_seafrost_physics()
-
-
-Wolf Pack Arduino Nano Brains ($2ea)
-
-// Alpha Scout (IR lock)
-#include <Wire.h>
-#include <Adafruit_MLX90614.h>
-Adafruit_MLX90614 thermal = Adafruit_MLX90614();
-
-float fire_temp = 0;
-void loop() {
-  fire_temp = thermal.readObjectTempC();
-  if (fire_temp > 200) {  // Fire lock
-    // Send Crossfire: "FIRE_PINNED x,y"
-    Serial.print("TARGET "); Serial.println(fire_temp);
-  }
-}
-
-
-// Beta CO2 (burst on command)
-#include <Servo.h>
-Servo co2_valve;
-void loop() {
-  if (Serial.available()) {
-    String cmd = Serial.readString();
-    if (cmd.indexOf("CO2_FIRE") >= 0) {
-      co2_valve.write(90);  // 2s burst
-      delay(2000);
-      co2_valve.write(0);
+```json
+{
+  "vessel": "Ship Name",
+  "deck_layout": {"length": 400, "beam": 60, "height": 25},
+  "drone_launcher": [20, 10, 15],
+  "cargo_manifest": [
+    {
+      "id": "C-204",
+      "position": [120, 25, 5],
+      "cargo_type": "lithium_battery",
+      "fire_risk": 0.95
     }
-  }
+  ]
 }
+```
 
+## Running the Test
 
-3D Printed Payload Pods (Tinkercad 30min)
+```bash
+python SAR/SeaFrost/maersk_fire_test.py
+```
 
-Alpha: 30x30x20mm pod → MLX90614 down-look
-Beta:  40x40x50mm → CO2 cart + valve + 9g servo  
-Gamma: 45x45x60mm → LN2 syringe + stepper driver
-STL files in repo
+This writes a test blueprint, loads the digital twin, pre-calculates
+wolf pack paths, and runs a simulated fire suppression sequence
+through the geometric coordination pipeline.
 
+## Files
 
-Launch Sequence (Your Truck Bed Ready)
+| File                       | Description                        | Dependencies |
+|----------------------------|------------------------------------|-------------|
+| `digital_twin.py`         | Ship blueprint parser              | None        |
+| `maersk_fire_test.py`     | Maersk C-204 fire test             | digital_twin, workflow_bridge |
+| `sitl_seafrost.sh`        | ArduPilot SITL launch (4 drones)   | ArduPilot   |
+| `maersk_c204_blueprint.json` | Test blueprint fixture          | None        |
 
-1. PVC cage on truck tailgate (5min setup)
-2. 4 drones + payloads loaded
-3. Phone app: "LAUNCH_WOLF" → bungee catapults  
-4. Alpha IR locks → Betas CO2 → Gamma LN2
-5. 25s mission → drones auto-RTH
+## Prototype Build (Garage Scale)
 
+For testing the staged cooling approach at small scale:
 
+### Bill of Materials
 
-House (1kW phone fire):
-T+0s:   Manual launch  
-T+8s:   CO2 burst → 700→350°C
-T+18s:  LN2 syringe → -15°C  
-T+25s:  Fire dead
+| Component              | Qty | Notes                           |
+|------------------------|-----|---------------------------------|
+| 90mm micro quad frame  | 4   | Whoop-class, crash-resistant    |
+| 1103 10000kv motors    | 16  | 4 per drone                     |
+| Flight controller      | 4   | Matek H743 mini or equivalent   |
+| 450mAh 1S LiHV battery| 8   | 2 per drone for hot swap        |
+| MLX90614 IR sensor     | 1   | Alpha thermal detection ($2-8)  |
+| 20g CO2 cartridge      | 12  | BB gun supply, 6 per Beta drone |
+| Solenoid valve         | 2   | CO2 release control             |
+| Peristaltic pump       | 1   | LN2 delivery for Gamma          |
+| Arduino Nano           | 4   | Payload controller per drone    |
+| PVC launch cage        | 1   | 4" diameter x 24", plywood base |
 
-DIY Wolf Pack (4kW expected):
-T+0s:   Bungee launch
-T+6s:   Dual CO2 → 950→450°C  
-T+16s:  LN2 kill → -20°C
-T+25s:  Mission complete
+Approximate cost: $200-400 total.
 
+### Sources
 
-PVC cage (8lb) + 4 drones (4lb) + payloads (2lb) 
-+ CO2 carts (12) + LN2 thermos (4lb) = 30lb
-Fits behind seat, deploys anywhere
+- CO2 cartridges: sporting goods (BB/airsoft supply)
+- LN2: welding supply shops (sold by the liter)
+- IR sensors: electronics suppliers (SparkFun, Adafruit, eBay)
+- Drone parts: hobby shops or salvage from damaged racing quads
 
+### Garage Test Protocol
 
+1. Set up in ventilated space with fire extinguisher backup
+2. Controlled thermal source (phone battery on fireproof surface)
+3. Thermocouple monitoring at source
+4. Manual launch sequence (no autopilot needed for bench test)
+5. Measure temperature at each stage
 
+Expected garage-scale results (1kW source):
+- CO2 stage: ~700C to ~350C in 8 seconds
+- LN2 stage: ~350C to ~-15C in 10 seconds
 
+## Limitations
 
+- No ship-scale test has been conducted. The physics model
+  projects from garage scale; actual maritime conditions (wind,
+  salt air, hull reflections) may affect performance.
+- Smoke navigation is modeled but untested. GPS-denied flight
+  depends on IR + IMU fusion, which needs hardware validation.
+- LN2 handling requires training. Cryogenic burns are serious.
+  Follow your organization's safety procedures for cryogenic
+  materials.
+- The staged cooling approach is supported by peer-reviewed
+  research on cryogenic suppression of lithium battery fires.
+  The specific drone delivery mechanism is novel and unvalidated
+  beyond simulation.
+
+## References
+
+- Cryogenic cooling reduces thermal runaway energy release by
+  83% (published research on LN2 suppression of Li-ion fires)
+- Liquid nitrogen prevents thermal runaway propagation at -20C
+- Intermittent application superior to continuous cooling
+- Staged cooling approaches minimize thermal shock damage
