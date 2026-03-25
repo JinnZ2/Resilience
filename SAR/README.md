@@ -173,14 +173,23 @@ SeaFrost Maersk C-204 test:
 Pre-calculated paths from ship digital twin
 ```
 
+## Waypoint Export
+
+Two output formats for integration with flight controllers:
+
+- **CSV**: `index,x_meters,y_meters,alt_meters,load` — for any tool
+- **QGC WPL 110**: Mission Planner / QGroundControl native format
+
+```python
+swarm.export("mavlink", origin_lat=44.76, origin_lon=-89.13,
+             filename="mission.txt")
+```
+
 ## Known Limitations
 
 - Parity check returns low pass rates when all inputs are similar
   (expected: uniform inputs produce uniform walks that rarely close).
   Real deployments with spatial diversity produce higher parity.
-- Spiral allocation is 2D. Altitude coordination requires extension.
-- SeaFrost stage transitions are not yet automated in the pipeline;
-  currently driven by the test script.
 - MAVLink adapter (`swarm_bridge.py`) has not been tested against
   live ArduPilot hardware.
 

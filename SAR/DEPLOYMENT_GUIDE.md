@@ -191,6 +191,35 @@ When a drone's thermal sensor reads above the threshold (default 0.7):
 3. Nearby drones receive tighter waypoints around the hot zone
 4. The hit is logged with drone ID and allocation coordinates
 
+### Altitude Layers
+
+Drones are assigned to altitude layers by ID range:
+
+| Layer | Altitude | Drone IDs | Purpose           |
+|-------|----------|-----------|--------------------|
+| 0     | 15m      | 0-9       | Low thermal scan   |
+| 1     | 30m      | 10-29     | Area coverage      |
+| 2     | 50m      | 30-49     | Wide survey        |
+
+This provides vertical coverage without requiring drones to
+coordinate altitude dynamically. Each layer runs its own
+spiral pattern independently.
+
+For SeaFrost wolf packs, altitude is role-based:
+- Alpha scout: 20m (clear view for thermal scan)
+- Beta CO2 drones: 12m (suppression delivery angle)
+- Gamma LN2 drone: 8m (close-range deep cooling)
+
+### Per-Drone State
+
+Each drone has its own geometric pipeline. This means:
+- One drone's dropout does not corrupt another's state
+- Parity checks reflect individual trajectory coherence
+- Recovery is per-drone, not global
+
+A 50-drone swarm runs 50 independent state machines coordinated
+through the shared spiral allocation space.
+
 ### Battery Management
 
 As batteries drain:
@@ -302,6 +331,39 @@ Use this to determine whether this system fits your needs.
 
 ---
 
+## Waypoint Export
+
+The system outputs waypoints in two formats:
+
+### CSV (for any tool)
+
+```
+index,x_meters,y_meters,alt_meters,load
+0,12.34,56.78,15.0,0.350
+1,-8.91,23.45,30.0,0.420
+```
+
+Loadable in any spreadsheet, GPS app, or custom script.
+
+### QGC WPL 110 (for Mission Planner / QGroundControl)
+
+```
+QGC WPL 110
+0  1  0  16  0  0  0  0  43.0731000  -89.4012000  0.0  1
+1  0  3  16  0  0  0  0  43.0732200  -89.4010500  15.0  1
+```
+
+This format loads directly into Mission Planner or QGroundControl.
+A $200 Pixhawk flight controller can fly these waypoints autonomously.
+
+Set the origin coordinates to your actual launch point:
+```python
+swarm.export("mavlink", origin_lat=44.7631, origin_lon=-89.1340,
+             filename="mission.txt")
+```
+
+---
+
 ## Limitations
 
 - **Not certified.** This software carries no warranty, certification,
@@ -311,12 +373,11 @@ Use this to determine whether this system fits your needs.
   No live SAR deployment has been conducted.
 - **No autopilot.** This handles coordination logic, not flight control.
   Integration with ArduPilot or equivalent is required for flight.
+  Waypoint export bridges this gap.
 - **Parity rates vary.** The dodecahedral parity check returns low pass
   rates when inputs are uniform. This is mathematically correct (identical
   inputs produce identical walks that don't close), not a defect. Real
   deployments with spatially diverse drones produce meaningful parity.
-- **2D allocation.** The spiral is planar. Altitude coordination requires
-  additional logic.
 - **SeaFrost is untested at ship scale.** The physics model is sound
   (Stefan-Boltzmann + forced convection), but no full-scale maritime
   test has been conducted. The garage-scale test validates the approach
