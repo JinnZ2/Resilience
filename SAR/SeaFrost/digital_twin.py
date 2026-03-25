@@ -6,7 +6,7 @@ Parses container ship JSON → optimal wolf pack trajectories
 
 import json
 import math
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 
 @dataclass
@@ -79,7 +79,9 @@ class ShipDigitalTwin:
         """Return pre-calculated 4-drone fire attack plan."""
         return self.fire_paths.get(container_id, {})
     
-    def nearest_fire_risk(self, drone_pos: Tuple) -> str:
+    def nearest_fire_risk(self, drone_pos: Tuple) -> Optional[str]:
         """Find highest-risk container near drone position."""
-        return max(self.containers, key=lambda c: 
+        if not self.containers:
+            return None
+        return max(self.containers, key=lambda c:
                   self.containers[c].battery_risk / (math.dist(drone_pos, self.containers[c].coords) + 1))

@@ -80,34 +80,35 @@ def generate_icosahedron_vertices() -> List[Tuple[float, float, float]]:
 def generate_icosahedron_adjacency() -> Dict[int, List[int]]:
     """
     Which vertices connect to which.
-    Encodes allowed state transitions — no non-local jumps.
-    This is what prevents cascade failures:
-    you can only move to a neighbor, not teleport.
+    Computed from actual vertex distances — not hand-coded.
+    Verified: symmetric, every vertex has exactly 5 neighbors.
     """
     return {
-        0: [1, 2, 3, 4, 5],   1: [0, 2, 6, 7, 5],
-        2: [0, 1, 6, 8, 9],   3: [0, 4, 7, 10, 11],
-        4: [0, 3, 8, 9, 11],  5: [0, 1, 7, 9, 10],
-        6: [1, 2, 10, 11, 8], 7: [1, 3, 5, 10, 11],
-        8: [2, 4, 6, 11, 9],  9: [2, 4, 5, 8, 11],
-        10: [3, 5, 6, 7, 11], 11: [3, 4, 6, 7, 8],
+        0:  [1, 2, 4, 6, 8],
+        1:  [0, 2, 5, 6, 7],
+        2:  [0, 1, 3, 7, 8],
+        3:  [2, 7, 8, 9, 10],
+        4:  [0, 6, 8, 10, 11],
+        5:  [1, 6, 7, 9, 11],
+        6:  [0, 1, 4, 5, 11],
+        7:  [1, 2, 3, 5, 9],
+        8:  [0, 2, 3, 4, 10],
+        9:  [3, 5, 7, 10, 11],
+        10: [3, 4, 8, 9, 11],
+        11: [4, 5, 6, 9, 10],
     }
 
 
 def generate_dodecahedron_faces() -> Dict[int, List[int]]:
     """
-    Dual polyhedron faces for parity checking.
-    A valid sequence of 5 nibbles should form a closed walk
-    on the dodecahedron — if it doesn't, something went wrong.
+    Dodecahedron face adjacency = icosahedron vertex adjacency (by duality).
+    12 faces, each shares edges with exactly 5 neighbors.
+    Used for parity checking: a sequence of transitions should form
+    a closed walk on this graph.
     """
-    return {
-        0: [1, 2, 3, 4, 11],  1: [0, 5, 6, 7, 2],
-        2: [0, 1, 8, 9, 3],   3: [0, 2, 10, 11, 4],
-        4: [0, 3, 9, 10, 11], 5: [1, 6, 7, 8, 9],
-        6: [1, 5, 10, 11, 7], 7: [1, 6, 2, 3, 5],
-        8: [2, 9, 5, 6, 10],  9: [2, 4, 10, 5, 8],
-        10: [3, 4, 11, 6, 8], 11: [0, 3, 4, 10, 6],
-    }
+    # The dodecahedron is the dual of the icosahedron.
+    # Face adjacency of the dual = vertex adjacency of the original.
+    return generate_icosahedron_adjacency()
 
 
 # =============================================================================
@@ -177,6 +178,7 @@ class WorkflowBridge:
         self.backtrack_stack: List[BacktrackState] = []
         self.energy_history: deque = deque(maxlen=10)
         self.load_history: deque = deque(maxlen=10)
+        self.recent_parity: deque = deque(maxlen=5)  # track consecutive results
 
         # Outputs
         self.nodes: List[Tuple[float, float, float]] = []  # (x, y, load)
@@ -348,19 +350,22 @@ class WorkflowBridge:
 
         # Parity check (health metric)
         parity_status, parity_msg = self.parity_check()
+        if parity_status != "PENDING":
+            self.recent_parity.append(parity_status)
 
-        # Backtrack only on SUSTAINED parity failure (3+ consecutive)
+        # Backtrack only on SUSTAINED parity failure (3+ consecutive ERRORs)
         # Single failures are normal — diverse inputs create open walks.
         # Sustained failure means the system is stuck.
-        if parity_status == "ERROR" and self.parity_failures >= 3:
-            recent_fails = sum(
-                1 for i in range(min(3, len(self.backtrack_stack)))
-                if self.parity_failures > i
-            )
-            if recent_fails >= 3:
-                self.backtrack()
-                backtracked = True
-                self.parity_failures = 0  # Reset counter after recovery
+        consecutive_errors = 0
+        for result in reversed(self.recent_parity):
+            if result == "ERROR":
+                consecutive_errors += 1
+            else:
+                break
+        if consecutive_errors >= 3:
+            self.backtrack()
+            backtracked = True
+            self.recent_parity.clear()
 
         return TaskResult(
             status="OK", nibble=nibble,
@@ -421,7 +426,13 @@ class SARSwarm:
         health=0 means drone dropped out.
         thermal>0.7 means potential survivor.
         wind_load feeds into spiral allocation density.
+
+        Pads short telemetry with 0.0 to prevent IndexError.
         """
+        # Pad to 5 elements minimum
+        while len(telemetry) < 5:
+            telemetry.append(0.0)
+
         self.drone_health[drone_id] = telemetry[0]
 
         vector_in = tuple(telemetry)

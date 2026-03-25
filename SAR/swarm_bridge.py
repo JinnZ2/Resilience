@@ -9,10 +9,12 @@ ArduPilot MAVLink → vector states → formation commands
 import math
 import random
 from collections import deque
-from pymavlink import mavutil
-import threading
+try:
+    from pymavlink import mavutil
+    HAS_MAVLINK = True
+except ImportError:
+    HAS_MAVLINK = False
 import time
-import numpy as np
 
 class SwarmBridge:
     def __init__(self, workflow_id="SAR_Swarm_01", sim_mode=False):
@@ -159,7 +161,10 @@ class SwarmBridge:
 
     # MAVLink interface
     def connect_mavlink(self, connection_string, drone_id):
-        """Connect ArduPilot drone via MAVLink."""
+        """Connect ArduPilot drone via MAVLink. Requires pymavlink."""
+        if not HAS_MAVLINK:
+            print(f"pymavlink not installed — run: pip install pymavlink")
+            return None
         try:
             conn = mavutil.mavlink_connection(connection_string, baud=57600)
             conn.wait_heartbeat()
@@ -188,9 +193,10 @@ class SwarmBridge:
                         telemetry = self._parse_mavlink(msg)
                         if telemetry:
                             result = self.process_drone_telemetry(drone_id, telemetry)
-                            self.send_waypoint(conn, *result["alloc"])
-                except:
-                    pass
+                            if "alloc" in result:
+                                self.send_waypoint(conn, *result["alloc"])
+                except (OSError, KeyError) as e:
+                    print(f"MAVLink error drone {drone_id}: {e}")
             time.sleep(0.1)
 
     def _parse_mavlink(self, msg):
@@ -232,7 +238,7 @@ def run_blizzard_sim():
         if t % 200 == 0:
             print(f"T={t/10:.0f}s: {survivor_hits} hits, {len(swarm.nodes)} nodes")
     
-    recovery_rate = sum(1 for n in swarm.nodes if n[2] < 0.8) / len(swarm.nodes)
+    recovery_rate = sum(1 for n in swarm.nodes if n[2] < 0.8) / max(1, len(swarm.nodes))
     print(f"\n✅ SIM COMPLETE")
     print(f"   Survivor hits: {survivor_hits}")
     print(f"   Recovery rate: {recovery_rate:.1%}")
