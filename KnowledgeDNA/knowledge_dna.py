@@ -41,6 +41,10 @@ class KnowledgeNode:
     energy: float
     timestamp: datetime
     position: Tuple[float, float] = (0.0, 0.0)
+    channel_capacity: float = 1.0   # transmission bandwidth (0-1)
+                                     # replaces position for coupling strength
+                                     # CB net = 0.3, internet = 0.9,
+                                     # face-to-face = 1.0, no contact = 0.0
 
 
 @dataclass
@@ -50,6 +54,20 @@ class KnowledgeEdge:
     target: str                 # child node_id
     transfer_efficiency: float = 0.8
     phase: float = 1.0         # alignment; -1 = destructive interference
+    transmission_type: str = "written"
+    # Transmission types and their characteristic curves:
+    #   "embodied"  — apprenticeship, hands-on practice
+    #                  high initial cost, very high retention, cannot be digitized
+    #                  efficiency degrades sharply without direct contact
+    #   "oral"      — storytelling, mentorship, conversation
+    #                  moderate bandwidth, degrades with each retelling
+    #                  context-dependent (you had to be there)
+    #   "written"   — text, documentation, code
+    #                  low bandwidth, high persistence, context-free
+    #                  the part that survives library fires
+    #   "digital"   — mesh networks, databases, broadcasts
+    #                  highest bandwidth, zero retention without infrastructure
+    #                  dies with the grid
 
 
 class DiGraph:
@@ -212,21 +230,51 @@ class KnowledgeDNA:
 
         return energy_map
 
-    # ----- Spatial locality -----
+    # ----- Channel coupling (replaces spatial locality) -----
+    #
+    # Physical distance is a proxy for what actually matters:
+    # transmission channel bandwidth. Two people 500 miles apart
+    # on the same CB net have higher coupling than two people in
+    # the same building who don't talk.
+    #
+    # channel_coupling uses the minimum channel capacity between
+    # two nodes. The bottleneck determines the bandwidth.
+
+    def channel_coupling(self, a: str, b: str) -> float:
+        """
+        Coupling strength between two nodes based on channel capacity.
+
+        Returns min(a.channel_capacity, b.channel_capacity).
+        The bottleneck determines the bandwidth — a high-capacity
+        node talking to a low-capacity node is limited by the weaker link.
+
+        This replaces Gaussian distance kernel. Two people on the same
+        CB radio net at 500 miles couple more strongly than two people
+        in the same building with no shared channel.
+        """
+        node_a = self.graph.nodes.get(a)
+        node_b = self.graph.nodes.get(b)
+        if node_a is None or node_b is None:
+            return 0.0
+        return min(node_a.channel_capacity, node_b.channel_capacity)
 
     def distance(self, a: str, b: str) -> float:
-        """Euclidean distance between two nodes in position space."""
+        """Euclidean distance between two nodes in position space.
+        Kept for backward compatibility and position dynamics."""
         pa = self.graph.nodes[a].position
         pb = self.graph.nodes[b].position
         return math.sqrt(sum((x - y) ** 2 for x, y in zip(pa, pb)))
 
-    def kernel(self, d: float, sigma: float = 1.0) -> float:
-        """Gaussian locality kernel. Nearby nodes interact more strongly."""
-        return math.exp(-(d ** 2) / (sigma ** 2))
+    def propagate_energy_coupled(self, node_id: str,
+                                  decay: float = 0.85) -> Dict[str, float]:
+        """
+        Backward propagation weighted by channel capacity.
 
-    def propagate_energy_local(self, node_id: str, decay: float = 0.85,
-                                sigma: float = 1.0) -> Dict[str, float]:
-        """Backward propagation with spatial locality weighting."""
+        Replaces propagate_energy_local (Gaussian distance kernel).
+        Channel capacity is the actual constraint on knowledge
+        transmission — not how far apart two people are, but
+        how much bandwidth they share.
+        """
         energy_map = {n: 0.0 for n in self.graph.nodes}
         if node_id not in self.graph.nodes:
             return energy_map
@@ -249,10 +297,9 @@ class KnowledgeDNA:
                 if edge is None:
                     continue
 
-                d = self.distance(parent, current)
-                locality = self.kernel(d, sigma)
-                transferred = (current_energy * edge.transfer_efficiency
-                               * edge.phase * decay * locality)
+                coupling = self.channel_coupling(parent, current)
+                eff = self._typed_efficiency(edge)
+                transferred = current_energy * eff * edge.phase * decay * coupling
 
                 if abs(transferred) > 1e-6:
                     energy_map[parent] += transferred
@@ -260,25 +307,149 @@ class KnowledgeDNA:
 
         return energy_map
 
-    # ----- Time decay -----
+    # ----- Time decay (with dormancy) -----
+    #
+    # Simple exponential decay assumes knowledge degrades uniformly.
+    # It doesn't. Some knowledge is latent for decades then activates
+    # under the right conditions. Your grandmother's fire knowledge
+    # isn't gone — it's dormant until the grid fails and suddenly
+    # it's the most valuable thing in the county.
+    #
+    # Three states:
+    #   active:  energy > dormancy_threshold → full contribution
+    #   dormant: energy decayed below threshold but above loss_floor
+    #            → reduced but recoverable. reactivation_factor
+    #            preserves a fraction that can be restored.
+    #   lost:    energy below loss_floor → genuinely gone.
+    #            embodied knowledge that died with its holder.
 
     def apply_time_decay(self, energy_map: Dict[str, float],
-                         lambda_decay: float = 0.00001) -> Dict[str, float]:
+                         lambda_decay: float = 0.00001,
+                         dormancy_threshold: float = 0.3,
+                         loss_floor: float = 0.02,
+                         reactivation_factor: float = 0.4) -> Dict[str, float]:
         """
-        Exponential time decay. Recent knowledge has more influence.
-        lambda_decay controls the rate: 0.00001 = slow (knowledge persists),
-        0.001 = fast (only recent matters).
+        Time decay with dormancy and reactivation.
+
+        Knowledge doesn't just fade linearly. It enters dormancy —
+        reduced but recoverable — before it's genuinely lost.
+
+        lambda_decay: rate of exponential decay
+        dormancy_threshold: below this, knowledge enters dormancy
+        loss_floor: below this, knowledge is genuinely gone
+        reactivation_factor: what fraction of dormant knowledge
+            can be recovered under the right conditions (0.4 = 40%)
+
+        Returns {node_id: effective_energy} where effective_energy
+        accounts for dormancy state.
         """
         now = datetime.now()
         decayed = {}
+
         for node_id, energy in energy_map.items():
             node = self.graph.nodes.get(node_id)
             if node is None:
                 decayed[node_id] = 0.0
                 continue
+
             dt = (now - node.timestamp).total_seconds()
-            decayed[node_id] = energy * math.exp(-lambda_decay * dt)
+            raw_decayed = energy * math.exp(-lambda_decay * dt)
+
+            if raw_decayed >= dormancy_threshold:
+                # Active: full contribution
+                decayed[node_id] = raw_decayed
+            elif raw_decayed >= loss_floor:
+                # Dormant: reduced but recoverable
+                # The knowledge exists but isn't actively shaping things
+                # until conditions reactivate it.
+                dormant_energy = loss_floor + (raw_decayed - loss_floor) * reactivation_factor
+                decayed[node_id] = dormant_energy
+            else:
+                # Lost: genuinely gone. The holder died.
+                # The embodied knowledge went with them.
+                decayed[node_id] = 0.0
+
         return decayed
+
+    # ----- Edge-type-specific transfer -----
+    #
+    # Oral, written, embodied, and digital knowledge transmit
+    # on different efficiency curves. A textbook citation and
+    # your grandmother's fire knowledge are not the same edge.
+    #
+    # embodied: high initial cost, very high retention per contact,
+    #           but requires physical co-presence. Efficiency drops
+    #           sharply with reduced contact frequency.
+    #           apprenticeship, hands-on practice.
+    #
+    # oral:     moderate bandwidth, degrades with each retelling.
+    #           context-dependent — "you had to be there."
+    #           stories, mentorship, conversation.
+    #
+    # written:  low bandwidth per unit time, but high persistence.
+    #           context-free — survives the death of the author.
+    #           text, documentation, code, this repo.
+    #
+    # digital:  highest bandwidth, zero retention without infrastructure.
+    #           dies with the grid. mesh networks, databases.
+
+    TRANSFER_CURVES = {
+        "embodied": {
+            "base_efficiency": 0.95,   # highest fidelity per contact
+            "contact_decay": 0.15,     # sharp drop without contact
+            "persistence": 0.95,       # stays with the person
+            "infrastructure_dep": 0.0, # needs no infrastructure
+        },
+        "oral": {
+            "base_efficiency": 0.70,
+            "contact_decay": 0.08,     # moderate degradation per retelling
+            "persistence": 0.60,
+            "infrastructure_dep": 0.0,
+        },
+        "written": {
+            "base_efficiency": 0.50,   # low bandwidth
+            "contact_decay": 0.01,     # almost no degradation over time
+            "persistence": 0.90,       # survives the author
+            "infrastructure_dep": 0.1, # needs paper or stone
+        },
+        "digital": {
+            "base_efficiency": 0.85,   # high bandwidth
+            "contact_decay": 0.02,
+            "persistence": 0.10,       # zero without grid
+            "infrastructure_dep": 0.95, # dies with infrastructure
+        },
+    }
+
+    def _typed_efficiency(self, edge: KnowledgeEdge) -> float:
+        """
+        Compute effective transfer efficiency based on edge type.
+
+        Combines the edge's base transfer_efficiency with the
+        characteristic curve of its transmission type.
+
+        Written knowledge: lower bandwidth but persists.
+        Embodied knowledge: higher bandwidth but needs contact.
+        Digital knowledge: highest bandwidth but needs infrastructure.
+        """
+        curve = self.TRANSFER_CURVES.get(
+            edge.transmission_type,
+            self.TRANSFER_CURVES["written"],
+        )
+
+        # Effective efficiency = base * type_modifier
+        # The edge's transfer_efficiency is the specific link quality.
+        # The curve's base_efficiency is the theoretical max for this type.
+        type_eff = min(edge.transfer_efficiency, curve["base_efficiency"])
+
+        # Infrastructure dependency reduces efficiency when channel capacity is low
+        src = self.graph.nodes.get(edge.source)
+        tgt = self.graph.nodes.get(edge.target)
+        if src and tgt:
+            min_channel = min(src.channel_capacity, tgt.channel_capacity)
+            infra_penalty = curve["infrastructure_dep"] * (1.0 - min_channel)
+            type_eff *= (1.0 - infra_penalty)
+
+        return type_eff
 
     # ----- Forward propagation -----
 
@@ -286,28 +457,29 @@ class KnowledgeDNA:
         """
         One step of forward energy propagation.
         Energy flows parent -> child along edges.
-        This models how influence spreads forward in time.
+        Uses edge-type-specific transfer functions.
         """
         new_energy = {n: 0.0 for n in self.graph.nodes}
         for edge in self.graph.all_edges():
             src = self.graph.nodes.get(edge.source)
             if src is None:
                 continue
-            transferred = src.energy * edge.transfer_efficiency * edge.phase
+            eff = self._typed_efficiency(edge)
+            transferred = src.energy * eff * edge.phase
             new_energy[edge.target] += transferred
         for node_id, energy in new_energy.items():
             self.graph.nodes[node_id].energy = energy
 
-    def forward_step_local(self, sigma: float = 1.0):
-        """Forward propagation with spatial locality."""
+    def forward_step_coupled(self):
+        """Forward propagation with channel capacity coupling."""
         new_energy = {n: 0.0 for n in self.graph.nodes}
         for edge in self.graph.all_edges():
             src = self.graph.nodes.get(edge.source)
             if src is None:
                 continue
-            d = self.distance(edge.source, edge.target)
-            locality = self.kernel(d, sigma)
-            transferred = src.energy * edge.transfer_efficiency * edge.phase * locality
+            coupling = self.channel_coupling(edge.source, edge.target)
+            eff = self._typed_efficiency(edge)
+            transferred = src.energy * eff * edge.phase * coupling
             new_energy[edge.target] += transferred
         for node_id, energy in new_energy.items():
             self.graph.nodes[node_id].energy = energy
@@ -455,13 +627,19 @@ class KnowledgeDNA:
 
     # ----- Field trace (full) -----
 
-    def trace_field(self, node_id: str) -> List[Dict]:
+    def trace_field(self, node_id: str, use_channels: bool = True) -> List[Dict]:
         """
-        Full field trace: backward propagation + time decay.
+        Full field trace: backward propagation + dormancy-aware time decay.
         Returns sorted list of {node, name, energy, contributors}.
         This is the answer to: "What is still actively shaping this state?"
+
+        use_channels: if True, uses channel-capacity coupling instead of
+        uniform propagation. Set False for legacy behavior.
         """
-        raw = self.propagate_energy(node_id)
+        if use_channels:
+            raw = self.propagate_energy_coupled(node_id)
+        else:
+            raw = self.propagate_energy(node_id)
         decayed = self.apply_time_decay(raw)
 
         results = []
@@ -644,42 +822,123 @@ if __name__ == "__main__":
     random.seed(42)
 
     print("=" * 66)
-    print("  KNOWLEDGE DNA — stdlib only, zero dependencies")
+    print("  KNOWLEDGE DNA — channel coupling, dormancy, typed edges")
     print("  knowledge as field propagation, not linear attribution")
     print("=" * 66)
 
     dna = KnowledgeDNA()
 
-    # Build the ancestry
+    # Build the ancestry with realistic transmission types and channels
     ts = datetime(2026, 3, 25, 21, 44, 11)
 
     solar = dna.add_thought("Solar Flux Capture", ["Nature/Evolution"],
                             energy=2.0, timestamp=ts)
+    # Nature -> Galileo: embodied observation, no infrastructure needed
     gravity = dna.add_thought("Gravity Storage", ["Galileo", "User Insight"],
                               energy=1.0, parents=[solar], timestamp=ts)
+    # Galileo -> Casimir: written transmission (papers survive centuries)
     vacuum = dna.add_thought("Vacuum Fluctuations", ["Casimir1948", "User Intuition"],
                              energy=2.5, parents=[gravity], timestamp=ts)
+    # Casimir -> User: embodied experiment (you had to do it yourself)
     piezo = dna.add_thought("Forest Piezo Harvest", ["User Experiment"],
                             energy=1.0, parents=[vacuum], timestamp=ts)
+    # User -> Repo: digital transmission (dies with the grid)
     mesh = dna.add_thought("Zero-Point Mesh", ["Heisenberg", "User Repo"],
                            energy=1.0, parents=[piezo], timestamp=ts)
 
-    # Add a cross-link to create a cycle for analysis
+    # Set transmission types on edges
+    edges = list(dna.graph.edges.values())
+    type_assignments = ["embodied", "written", "embodied", "digital"]
+    for edge, ttype in zip(edges, type_assignments):
+        edge.transmission_type = ttype
+
+    # Set channel capacities
+    # Nature has infinite channel (observation is always available)
+    # Galileo's written work: high persistence channel
+    # User experiment: high channel (direct contact)
+    # Repo: depends on infrastructure
+    for nid, node in dna.graph.nodes.items():
+        if "Solar" in node.name:
+            node.channel_capacity = 1.0     # nature is always broadcasting
+        elif "Gravity" in node.name:
+            node.channel_capacity = 0.8     # written record survives
+        elif "Vacuum" in node.name:
+            node.channel_capacity = 0.7     # papers in libraries
+        elif "Piezo" in node.name:
+            node.channel_capacity = 0.9     # direct experiment
+        elif "Mesh" in node.name:
+            node.channel_capacity = 0.4     # digital — needs infrastructure
+
+    # Cross-link cycle
     dna.graph.add_edge(KnowledgeEdge(
         source=mesh, target=solar,
         transfer_efficiency=0.3, phase=0.5,
+        transmission_type="digital",
     ))
 
     # Full report
     dna.print_report(target_node=mesh)
 
-    # Forward evolution
-    print("  FORWARD EVOLUTION (5 steps + noise):")
+    # Compare transmission types
+    print(f"\n{'─'*66}")
+    print("  TRANSMISSION TYPE COMPARISON")
+    print(f"{'─'*66}")
+    for edge in dna.graph.all_edges():
+        src = dna.graph.nodes[edge.source].name
+        tgt = dna.graph.nodes[edge.target].name
+        typed_eff = dna._typed_efficiency(edge)
+        print(f"    {src[:20]:20s} -> {tgt[:20]:20s}"
+              f"  type={edge.transmission_type:10s}"
+              f"  eff={typed_eff:.3f}")
+
+    # Forward evolution comparing typed vs uniform
+    print(f"\n{'─'*66}")
+    print("  FORWARD EVOLUTION (typed transfer functions)")
+    print(f"{'─'*66}")
     for i in range(5):
         dna.forward_step()
         dna.inject_noise(magnitude=0.02)
         total_e = sum(n.energy for n in dna.graph.nodes.values())
         print(f"    Step {i+1}: total energy = {total_e:.4f}")
+
+    # Dormancy demonstration
+    print(f"\n{'─'*66}")
+    print("  DORMANCY: knowledge that's sleeping, not dead")
+    print(f"{'─'*66}")
+
+    # Create a node with old timestamp to demonstrate dormancy
+    dna2 = KnowledgeDNA()
+    old_ts = datetime(1950, 1, 1)
+    recent_ts = datetime(2025, 1, 1)
+
+    grandmother = dna2.add_thought("Grandmother's Fire Knowledge",
+                                    ["Oral Tradition"], energy=3.0,
+                                    timestamp=old_ts)
+    textbook = dna2.add_thought("Fire Science Textbook",
+                                 ["Academic"], energy=1.5,
+                                 timestamp=recent_ts)
+    # Set edge types
+    for nid, node in dna2.graph.nodes.items():
+        node.channel_capacity = 0.8
+
+    # Apply decay to both
+    energy_map = {grandmother: 3.0, textbook: 1.5}
+    decayed = dna2.apply_time_decay(energy_map, lambda_decay=0.0000001)
+
+    for node_id, energy in decayed.items():
+        node = dna2.graph.nodes[node_id]
+        original = energy_map[node_id]
+        state = "ACTIVE" if energy >= 0.3 else ("DORMANT" if energy >= 0.02 else "LOST")
+        print(f"    {node.name:<35s} {original:.1f} -> {energy:.4f}  [{state}]")
+
+    print(f"""
+    The grandmother's fire knowledge decayed below active threshold
+    but remains DORMANT — recoverable if someone reactivates the
+    transmission chain. The textbook stays ACTIVE because it's recent.
+
+    When the grid fails and the textbook's digital copies go dark,
+    the dormant knowledge is what remains. Not dead. Sleeping.
+    Waiting for someone to ask the right question.""")
 
     # Export
     dna.export_csv("knowledge_dna.csv")
@@ -688,22 +947,27 @@ if __name__ == "__main__":
     print(f"\n  Exported: knowledge_dna.csv, field_trace.csv")
 
     print(f"\n{'='*66}")
-    print("  WHAT THIS MODELS")
+    print("  WHAT CHANGED")
     print(f"{'='*66}")
     print("""
-  Standard attribution: A cited B. End of story.
+  [FIXED] Spatial locality was geometric distance (proxy)
+    -> Now: channel capacity (actual constraint)
+    -> Two people on the same CB net at 500 miles couple more strongly
+       than two people in the same building who don't talk.
 
-  This system:
-  - Energy propagates backward through ALL ancestors, weighted
-  - Transfer efficiency models how well knowledge was transmitted
-  - Phase models alignment (+1) or conflict (-1)
-  - Time decay means old unrefined knowledge fades
-  - Cycles reveal self-reinforcing or dissipative loops
-  - Fragility analysis shows which nodes are load-bearing
-  - Attractors show which ideas persist under perturbation
+  [FIXED] Time decay was uniform exponential (too simple)
+    -> Now: three states — active, dormant, lost
+    -> Dormant knowledge is recoverable. Lost knowledge is gone.
+    -> Your grandmother's fire knowledge isn't dead. It's sleeping.
 
-  The question changes from "who contributed" to
-  "what is still actively shaping this state."
+  [FIXED] Edge transfer was uniform (dishonest)
+    -> Now: four transmission types with different curves:
+       embodied:  0.95 base, needs contact, no infrastructure dep
+       oral:      0.70 base, degrades per retelling
+       written:   0.50 base, almost no degradation, survives author
+       digital:   0.85 base, dies with the grid
+    -> The fire knowledge your grandmother carries in her hands
+       propagates differently than a textbook citation.
 
-  No networkx. No pandas. No matplotlib. Just Python.
+  The physics got more honest. The metaphors became measurements.
 """)
