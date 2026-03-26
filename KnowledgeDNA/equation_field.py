@@ -554,6 +554,72 @@ def build_equation_library() -> List[Equation]:
                         "Social networks, power grids, food webs, "
                         "knowledge transmission chains.",
         ),
+        # ---- Phi family ----
+        Equation(
+            name="Golden Ratio (phi)",
+            formula="phi = (1 + sqrt(5)) / 2 = 1.618...",
+            properties=[
+                Property("self_similarity", 1.0, "geometry"),
+                Property("optimal_packing", 0.9, "geometry"),
+                Property("minimal_overlap", 0.95, "allocation"),
+                Property("fibonacci_scaling", 0.9, "growth"),
+                Property("irrational_spacing", 1.0, "number_theory"),
+                Property("convergent_ratio", 0.8, "dynamics"),
+                Property("spiral_growth", 0.9, "morphology"),
+                Property("resonance_avoidance", 0.85, "stability"),
+                Property("energy_minimization", 0.7, "thermodynamics"),
+                Property("fractal_nesting", 0.8, "geometry"),
+                Property("phyllotaxis", 0.9, "biology"),
+                Property("proportion_stability", 0.85, "structure"),
+            ],
+            description="The most irrational number. Maximally avoids resonance. "
+                        "Shows up everywhere not because of mysticism but because "
+                        "systems that avoid commensurability survive longer.",
+        ),
+        Equation(
+            name="Fibonacci Sequence",
+            formula="F(n) = F(n-1) + F(n-2), F(n)/F(n-1) -> phi",
+            properties=[
+                Property("fibonacci_scaling", 1.0, "growth"),
+                Property("population_dynamics", 0.7, "ecology"),
+                Property("convergent_ratio", 0.9, "dynamics"),
+                Property("self_similarity", 0.7, "geometry"),
+                Property("resource_competition", 0.4, "economics"),
+                Property("spiral_growth", 0.8, "morphology"),
+            ],
+            description="Each term is the sum of the two before. Converges to phi. "
+                        "Rabbit populations, tree branching, shell spirals.",
+        ),
+        Equation(
+            name="Golden Angle",
+            formula="theta = 2*pi*(1 - 1/phi) = 137.507...",
+            properties=[
+                Property("minimal_overlap", 1.0, "allocation"),
+                Property("optimal_packing", 1.0, "geometry"),
+                Property("phyllotaxis", 1.0, "biology"),
+                Property("irrational_spacing", 0.9, "number_theory"),
+                Property("uniform_coverage", 0.95, "allocation"),
+                Property("resonance_avoidance", 0.9, "stability"),
+                Property("spiral_growth", 1.0, "morphology"),
+            ],
+            description="The angular analog of phi. Why sunflower seeds pack perfectly. "
+                        "Why our drone spiral has no gaps.",
+        ),
+        Equation(
+            name="Penrose Tiling",
+            formula="aperiodic tiling with phi-ratio rhombi",
+            properties=[
+                Property("self_similarity", 1.0, "geometry"),
+                Property("fractal_nesting", 1.0, "geometry"),
+                Property("minimal_overlap", 0.7, "allocation"),
+                Property("pattern_recognition", 0.6, "sensing"),
+                Property("compression", 0.5, "encoding"),
+                Property("optimal_packing", 0.8, "geometry"),
+                Property("proportion_stability", 0.9, "structure"),
+            ],
+            description="Fills a plane without repeating. Quasicrystals. "
+                        "Order without periodicity. Structure without pattern lock.",
+        ),
     ]
 
 
@@ -662,6 +728,92 @@ def build_domain_library() -> List[Domain]:
             ],
             description="Human decision-making under stress. "
                         "Attention, working memory, crisis response.",
+        ),
+        # ---- Domains where phi shows up ----
+        Domain(
+            name="Antenna Design",
+            needs=[
+                Property("resonance_avoidance", 0.9),
+                Property("frequency_decomposition", 0.7),
+                Property("optimal_packing", 0.6),
+                Property("fibonacci_scaling", 0.5),
+                Property("self_similarity", 0.8),
+            ],
+            description="Broadband antennas use phi-spacing to avoid resonance "
+                        "at any particular frequency. Log-periodic, fractal.",
+        ),
+        Domain(
+            name="Structural Engineering",
+            needs=[
+                Property("proportion_stability", 0.9),
+                Property("energy_minimization", 0.8),
+                Property("fractal_nesting", 0.5),
+                Property("optimal_packing", 0.7),
+                Property("self_similarity", 0.4),
+            ],
+            description="Load distribution, column spacing, material efficiency.",
+        ),
+        Domain(
+            name="Market Dynamics",
+            needs=[
+                Property("fibonacci_scaling", 0.8),
+                Property("convergent_ratio", 0.7),
+                Property("resonance_avoidance", 0.5),
+                Property("proportion_stability", 0.6),
+                Property("S_curve_adoption", 0.4),
+            ],
+            description="Fibonacci retracements in price action. Not because markets "
+                        "are mystical but because feedback systems avoid resonance.",
+        ),
+        Domain(
+            name="Morphogenesis",
+            needs=[
+                Property("phyllotaxis", 1.0),
+                Property("spiral_growth", 0.9),
+                Property("fibonacci_scaling", 0.8),
+                Property("self_similarity", 0.7),
+                Property("optimal_packing", 0.8),
+                Property("energy_minimization", 0.6),
+            ],
+            description="How organisms grow form. Leaf arrangement, shell spirals, "
+                        "branching patterns. The original phi computer.",
+        ),
+        Domain(
+            name="Mesh Network Allocation",
+            needs=[
+                Property("minimal_overlap", 1.0),
+                Property("uniform_coverage", 0.9),
+                Property("optimal_packing", 0.8),
+                Property("resonance_avoidance", 0.5),
+                Property("spiral_growth", 0.6),
+                Property("irrational_spacing", 0.4),
+            ],
+            description="Drone waypoint spacing, sensor placement, "
+                        "seed protocol node distribution. The SAR spiral.",
+        ),
+        Domain(
+            name="Music / Acoustics",
+            needs=[
+                Property("resonance_avoidance", 0.7),
+                Property("proportion_stability", 0.8),
+                Property("fibonacci_scaling", 0.5),
+                Property("convergent_ratio", 0.6),
+                Property("frequency_decomposition", 0.4),
+            ],
+            description="Room acoustics, instrument design, diffuser panels. "
+                        "Phi-ratio dimensions prevent standing waves.",
+        ),
+        Domain(
+            name="Quasicrystal Materials",
+            needs=[
+                Property("self_similarity", 1.0),
+                Property("fractal_nesting", 0.9),
+                Property("optimal_packing", 0.8),
+                Property("proportion_stability", 0.7),
+                Property("minimal_overlap", 0.6),
+            ],
+            description="Alloys with phi-ratio atomic spacing. Harder, "
+                        "more corrosion resistant. Discovered 1982, Nobel 2011.",
         ),
     ]
 
