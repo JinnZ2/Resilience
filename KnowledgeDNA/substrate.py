@@ -52,106 +52,207 @@ from KnowledgeDNA.equation_field import (
 
 
 # =============================================================================
-# SUBSTRATE DECOMPOSITION — break problems into physics
+# VECTOR SYNTHESIZER — no hardcoded keyword map
 # =============================================================================
+#
+# Instead of a static dict mapping words to properties, we build the map
+# dynamically from the equation and domain metadata that already exists.
+#
+# Every property name, equation description, and domain description is
+# a signal. We decompose them into tokens, build associations, and use
+# those to match any new input — even words we've never seen.
+#
+# "antenna" isn't in any keyword map. But the Antenna Design domain
+# description contains "broadband", "resonance", "frequency". Those
+# words also appear in equation descriptions. The synthesizer finds
+# the path: unknown word → domain description → property associations.
+#
+# This is how substrate reasoning should work: the vocabulary
+# grows from the physics, not from someone hand-coding mappings.
 
-# Property keyword map: natural language → substrate properties
-# This is the bridge between how people describe problems
-# and what equations actually govern them
-KEYWORD_MAP = {
-    # Flow / transport
-    "flow": ["gradient_flow", "spatial_coupling"],
-    "distribute": ["gradient_flow", "network_structure", "spatial_coupling"],
-    "spread": ["diffusion_on_graphs", "gradient_flow", "spatial_coupling"],
-    "transport": ["gradient_flow", "pressure_dynamics", "spatial_coupling"],
-    "route": ["network_structure", "gradient_flow"],
-    "move": ["gradient_flow", "pressure_dynamics"],
-    "deliver": ["gradient_flow", "network_structure"],
+def _tokenize(text: str) -> List[str]:
+    """Split text into lowercase tokens, strip punctuation."""
+    tokens = []
+    for word in text.lower().split():
+        clean = word.strip(".,;:!?()[]{}\"'+-=*/\\<>")
+        if clean and len(clean) > 1:
+            tokens.append(clean)
+    return tokens
 
-    # Decay / loss
-    "decay": ["decay_modeling", "half_life", "memory_fading"],
-    "lose": ["decay_modeling", "memory_fading"],
-    "fade": ["decay_modeling", "memory_fading"],
-    "die": ["decay_modeling", "population_dynamics"],
-    "deplete": ["decay_modeling", "resource_competition"],
-    "erode": ["decay_modeling", "gradient_flow"],
-    "forget": ["memory_fading", "decay_modeling"],
 
-    # Growth / population
-    "grow": ["population_dynamics", "carrying_capacity", "spiral_growth"],
-    "reproduce": ["population_dynamics", "fibonacci_scaling"],
-    "scale": ["carrying_capacity", "saturation", "fibonacci_scaling"],
-    "expand": ["spiral_growth", "population_dynamics"],
-    "saturate": ["saturation", "carrying_capacity", "diminishing_returns"],
-    "limit": ["carrying_capacity", "saturation", "budget_constraint"],
+def _stem(word: str) -> str:
+    """
+    Minimal suffix stripping. Not Porter — just enough to match
+    'frequencies' to 'frequency', 'distributing' to 'distribut',
+    'resonance' to 'reson'. Stdlib only.
+    """
+    # Order matters — check longer suffixes first
+    for suffix in ["ation", "ting", "ment", "ness", "able", "ible",
+                    "ence", "ance", "ious", "eous", "ical", "ally",
+                    "ized", "ises", "ings", "less", "ment", "ful",
+                    "ing", "ies", "ous", "ive", "ity", "ual",
+                    "ion", "ant", "ent", "ate", "ise", "ize",
+                    "tic", "ist", "ary", "ory",
+                    "ed", "ly", "er", "al", "es", "en", "ic"]:
+        if word.endswith(suffix) and len(word) - len(suffix) >= 3:
+            return word[:-len(suffix)]
+    if word.endswith("s") and len(word) > 3 and not word.endswith("ss"):
+        return word[:-1]
+    return word
 
-    # Structure / network
-    "connect": ["network_structure", "spatial_coupling", "community_detection"],
-    "network": ["network_structure", "diffusion_on_graphs", "community_detection"],
-    "cluster": ["community_detection", "network_structure"],
-    "organize": ["self_similarity", "network_structure", "synchronization"],
-    "coordinate": ["synchronization", "network_structure"],
-    "mesh": ["network_structure", "spatial_coupling", "minimal_overlap"],
 
-    # Conservation / balance
-    "conserve": ["energy_conservation", "budget_constraint"],
-    "balance": ["energy_conservation", "equilibrium_seeking"],
-    "budget": ["budget_constraint", "energy_conservation"],
-    "sustain": ["energy_conservation", "carrying_capacity"],
-    "efficient": ["energy_minimization", "optimal_packing", "budget_constraint"],
-    "optimize": ["energy_minimization", "optimal_packing", "budget_constraint"],
+def _trigrams(word: str) -> Set[str]:
+    """Character trigrams for fuzzy matching."""
+    if len(word) < 3:
+        return {word}
+    return {word[i:i+3] for i in range(len(word) - 2)}
 
-    # Information / signal
-    "signal": ["information_measure", "frequency_decomposition", "compression"],
-    "communicate": ["information_measure", "compression", "network_structure"],
-    "encode": ["compression", "information_measure", "pattern_recognition"],
-    "detect": ["pattern_recognition", "frequency_decomposition"],
-    "measure": ["information_measure", "uncertainty_quantification"],
-    "noise": ["information_measure", "uncertainty_quantification"],
 
-    # Stability / resilience
-    "stable": ["proportion_stability", "resonance_avoidance", "equilibrium_seeking"],
-    "resilient": ["resonance_avoidance", "diversity_measure", "energy_conservation"],
-    "robust": ["resonance_avoidance", "proportion_stability"],
-    "fail": ["decay_modeling", "network_structure", "synchronization"],
-    "recover": ["equilibrium_seeking", "energy_conservation"],
-    "adapt": ["convergent_ratio", "equilibrium_seeking"],
+def _trigram_similarity(a: str, b: str) -> float:
+    """Jaccard similarity on character trigrams. 0-1."""
+    ta, tb = _trigrams(a), _trigrams(b)
+    if not ta or not tb:
+        return 0.0
+    intersection = len(ta & tb)
+    union = len(ta | tb)
+    return intersection / union if union > 0 else 0.0
 
-    # Spatial / geometric
-    "pack": ["optimal_packing", "minimal_overlap"],
-    "cover": ["uniform_coverage", "minimal_overlap", "optimal_packing"],
-    "spiral": ["spiral_growth", "minimal_overlap", "irrational_spacing"],
-    "tile": ["optimal_packing", "fractal_nesting", "self_similarity"],
-    "pattern": ["self_similarity", "pattern_recognition", "fractal_nesting"],
-    "fractal": ["fractal_nesting", "self_similarity"],
 
-    # Competition / economics
-    "compete": ["resource_competition", "carrying_capacity"],
-    "scarce": ["resource_competition", "budget_constraint"],
-    "allocate": ["budget_constraint", "optimal_packing", "minimal_overlap"],
-    "price": ["resource_competition", "convergent_ratio"],
-    "market": ["fibonacci_scaling", "convergent_ratio", "resource_competition"],
-    "trade": ["gradient_flow", "network_structure", "resource_competition"],
+class VectorSynthesizer:
+    """
+    Builds property vectors from raw text by synthesizing associations
+    from equation/domain metadata. No hardcoded keyword map.
 
-    # Synchronization / coupling
-    "sync": ["synchronization", "spatial_coupling", "resonance"],
-    "couple": ["spatial_coupling", "synchronization"],
-    "resonate": ["resonance", "frequency_decomposition", "synchronization"],
-    "oscillate": ["synchronization", "resonance", "frequency_decomposition"],
-    "cascade": ["spatial_coupling", "network_structure", "decay_modeling"],
+    Three signals, combined:
+    1. Property name matching — split "frequency_decomposition" into
+       ["frequency", "decomposition"], match input against those.
+    2. Description corpus — words in equation/domain descriptions
+       that co-occur with each property.
+    3. Stem + trigram fuzzy matching — "frequencies" matches "frequency",
+       "antenna" partially matches "resonance_avoidance" through
+       description overlap.
+    """
 
-    # Bio-specific
-    "food": ["carrying_capacity", "population_dynamics", "decay_modeling",
-             "resource_competition", "spatial_coupling"],
-    "energy": ["energy_conservation", "gradient_flow", "budget_constraint",
-               "synchronization"],
-    "water": ["gradient_flow", "pressure_dynamics", "carrying_capacity",
-              "decay_modeling"],
-    "soil": ["population_dynamics", "decay_modeling", "carrying_capacity",
-             "phyllotaxis"],
-    "knowledge": ["decay_modeling", "memory_fading", "diffusion_on_graphs",
-                  "network_structure", "half_life"],
-}
+    def __init__(self, equations: Dict[str, 'Equation'],
+                 domains: Dict[str, 'Domain']):
+        # All known property names
+        self.all_properties: Set[str] = set()
+        # Property name tokens: "frequency_decomposition" → {"frequency", "decomposition"}
+        self.prop_tokens: Dict[str, Set[str]] = {}
+        # Corpus associations: word → {property: weight}
+        self.corpus: Dict[str, Dict[str, float]] = {}
+        # Domain name → needs (for domain-mediated matching)
+        self.domain_needs: Dict[str, List[str]] = {}
+
+        self._build(equations, domains)
+
+    def _build(self, equations: Dict[str, 'Equation'],
+               domains: Dict[str, 'Domain']):
+        """Build all association indices from metadata."""
+
+        # Collect all properties
+        for eq in equations.values():
+            for p in eq.properties:
+                self.all_properties.add(p.name)
+        for domain in domains.values():
+            for p in domain.needs:
+                self.all_properties.add(p.name)
+
+        # Decompose property names into tokens
+        for prop in self.all_properties:
+            tokens = set(prop.lower().replace("_", " ").split())
+            self.prop_tokens[prop] = tokens
+
+        # Build corpus from equation descriptions
+        for eq in equations.values():
+            eq_props = {p.name for p in eq.properties}
+            words = _tokenize(eq.description)
+            # Also tokenize the equation name
+            words.extend(_tokenize(eq.name))
+            for word in words:
+                stem = _stem(word)
+                if stem not in self.corpus:
+                    self.corpus[stem] = {}
+                for prop in eq_props:
+                    self.corpus[stem][prop] = self.corpus[stem].get(prop, 0) + 1.0
+
+        # Build corpus from domain descriptions
+        for domain in domains.values():
+            domain_props = {p.name for p in domain.needs}
+            self.domain_needs[domain.name.lower()] = [p.name for p in domain.needs]
+            words = _tokenize(domain.description)
+            words.extend(_tokenize(domain.name))
+            for word in words:
+                stem = _stem(word)
+                if stem not in self.corpus:
+                    self.corpus[stem] = {}
+                for prop in domain_props:
+                    self.corpus[stem][prop] = self.corpus[stem].get(prop, 0) + 0.7
+
+        # Normalize corpus weights per stem
+        for stem in self.corpus:
+            total = sum(self.corpus[stem].values())
+            if total > 0:
+                for prop in self.corpus[stem]:
+                    self.corpus[stem][prop] /= total
+
+    def synthesize(self, text: str) -> Dict[str, float]:
+        """
+        Convert arbitrary text to a property weight vector.
+
+        Combines three signals:
+        1. Direct property name token match (strongest)
+        2. Corpus association via stemmed words
+        3. Trigram fuzzy match against property name tokens
+
+        Returns {property_name: weight} for all properties with weight > 0.
+        """
+        words = _tokenize(text)
+        if not words:
+            return {}
+
+        property_scores: Dict[str, float] = {}
+
+        for word in words:
+            stem = _stem(word)
+
+            # Signal 1: Direct property name token match
+            for prop, tokens in self.prop_tokens.items():
+                for token in tokens:
+                    if stem == _stem(token) or word == token:
+                        property_scores[prop] = property_scores.get(prop, 0) + 3.0
+                    elif _trigram_similarity(stem, _stem(token)) > 0.5:
+                        sim = _trigram_similarity(stem, _stem(token))
+                        property_scores[prop] = property_scores.get(prop, 0) + 2.0 * sim
+
+            # Signal 2: Corpus association
+            if stem in self.corpus:
+                for prop, weight in self.corpus[stem].items():
+                    property_scores[prop] = property_scores.get(prop, 0) + weight * 2.0
+
+            # Also check the unstemmed word
+            if word in self.corpus and word != stem:
+                for prop, weight in self.corpus[word].items():
+                    property_scores[prop] = property_scores.get(prop, 0) + weight * 1.5
+
+            # Signal 3: Check if word matches a domain name → pull in its needs
+            for domain_name, needs in self.domain_needs.items():
+                domain_tokens = _tokenize(domain_name)
+                for dt in domain_tokens:
+                    if stem == _stem(dt) or _trigram_similarity(word, dt) > 0.6:
+                        for prop in needs:
+                            property_scores[prop] = property_scores.get(prop, 0) + 1.5
+
+        if not property_scores:
+            return {}
+
+        # Normalize to 0-1
+        max_score = max(property_scores.values())
+        if max_score > 0:
+            property_scores = {p: s / max_score for p, s in property_scores.items()}
+
+        # Filter low-signal noise
+        return {p: round(s, 4) for p, s in property_scores.items() if s >= 0.05}
 
 
 # =============================================================================
@@ -237,6 +338,10 @@ class SubstrateReasoner:
         """
         Initialize with the standard equation and domain libraries.
         Add custom equations/domains for your specific field.
+
+        The vector synthesizer is built automatically from all
+        equation and domain metadata. No hardcoded keyword map.
+        Add a new equation or domain → vocabulary grows automatically.
         """
         self.field = EquationField()
 
@@ -254,46 +359,52 @@ class SubstrateReasoner:
 
         self.field.propagate()
 
+        # Build synthesizer from all metadata
+        self.synthesizer = VectorSynthesizer(
+            self.field.equations, self.field.domains,
+        )
+
     # ----- Decomposition -----
 
     def decompose(self, text: str) -> SubstrateDecomposition:
         """
-        Break natural language into substrate properties.
+        Break natural language into substrate properties via vector synthesis.
 
-        Tokenizes the text, matches against the keyword map,
-        and returns weighted properties. More keyword hits = higher weight.
+        No hardcoded keyword map. The synthesizer builds associations
+        from equation/domain metadata using three signals:
+        1. Property name token matching (direct)
+        2. Description corpus co-occurrence (indirect)
+        3. Stem + trigram fuzzy matching (approximate)
+
+        "antenna" → matches Antenna Design domain → picks up
+        resonance_avoidance, frequency_decomposition, etc.
+        No one had to put "antenna" in a keyword dict.
         """
-        words = text.lower().split()
-        # Strip punctuation
-        words = [w.strip(".,;:!?()[]{}\"'") for w in words]
+        property_weights = self.synthesizer.synthesize(text)
 
+        # Extract keywords (tokens that contributed signal)
         keywords_found = []
-        property_counts: Dict[str, int] = {}
-
-        for word in words:
-            if word in KEYWORD_MAP:
+        for word in _tokenize(text):
+            stem = _stem(word)
+            if stem in self.synthesizer.corpus:
                 keywords_found.append(word)
-                for prop in KEYWORD_MAP[word]:
-                    property_counts[prop] = property_counts.get(prop, 0) + 1
+            else:
+                # Check property name tokens
+                for prop, tokens in self.synthesizer.prop_tokens.items():
+                    for token in tokens:
+                        if stem == _stem(token):
+                            keywords_found.append(word)
+                            break
+                    else:
+                        continue
+                    break
 
-        # Also check bigrams
-        for i in range(len(words) - 1):
-            bigram = f"{words[i]} {words[i+1]}"
-            # No bigram map yet, but the structure supports it
-
-        # Normalize weights
-        max_count = max(property_counts.values()) if property_counts else 1
-        property_weights = {
-            prop: count / max_count
-            for prop, count in property_counts.items()
-        }
-
-        unique_props = sorted(property_counts.keys(),
-                              key=lambda p: -property_counts[p])
+        unique_props = sorted(property_weights.keys(),
+                              key=lambda p: -property_weights[p])
 
         return SubstrateDecomposition(
             input_text=text,
-            keywords_found=keywords_found,
+            keywords_found=list(dict.fromkeys(keywords_found)),  # dedupe, keep order
             substrate_properties=unique_props,
             property_weights=property_weights,
         )
