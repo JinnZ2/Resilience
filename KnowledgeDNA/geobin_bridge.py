@@ -64,66 +64,126 @@ except ImportError:
 # GEIS ENCODING — the geometric identity layer
 # =============================================================================
 
-# Octahedral vertex bits → direction mapping
-# Same 6 directions as seed_protocol.py and equation_field.py
-VERTEX_MAP = {
-    "000": {"direction": "+X", "index": 0, "axis": "food_water"},
-    "001": {"direction": "-X", "index": 1, "axis": "energy"},
-    "010": {"direction": "+Y", "index": 2, "axis": "social"},
-    "011": {"direction": "-Y", "index": 3, "axis": "institutional"},
-    "100": {"direction": "+Z", "index": 4, "axis": "knowledge"},
-    "101": {"direction": "-Z", "index": 5, "axis": "infrastructure"},
-    # Extended: compound directions (edges, faces)
-    "110": {"direction": "+X+Y", "index": -1, "axis": "food_social"},
-    "111": {"direction": "+X+Y+Z", "index": -1, "axis": "convergent"},
+# Structural constants only — directions and indices.
+# Properties are derived, not assigned.
+VERTEX_GEOMETRY = {
+    "000": {"direction": "+X", "index": 0},
+    "001": {"direction": "-X", "index": 1},
+    "010": {"direction": "+Y", "index": 2},
+    "011": {"direction": "-Y", "index": 3},
+    "100": {"direction": "+Z", "index": 4},
+    "101": {"direction": "-Z", "index": 5},
+    "110": {"direction": "+X+Y", "index": -1},
+    "111": {"direction": "+X+Y+Z", "index": -1},
 }
 
-# Operators and their substrate properties
-OPERATOR_MAP = {
-    "O": {
-        "name": "origin",
-        "properties": ["self_similarity", "equilibrium_seeking", "energy_conservation"],
-        "description": "Radial symmetric attractor. Collapse to center.",
-    },
-    "I": {
-        "name": "identity",
-        "properties": ["proportion_stability", "convergent_ratio", "self_similarity"],
-        "description": "Invariant under transformation. What persists.",
-    },
-    "X": {
-        "name": "exchange",
-        "properties": ["spatial_coupling", "energy_transfer", "synchronization"],
-        "description": "Bidirectional flow. Coupling between domains.",
-    },
-    "Δ": {
-        "name": "delta",
-        "properties": ["gradient_flow", "decay_modeling", "pressure_dynamics"],
-        "description": "Change operator. Gradient, difference, transformation.",
-    },
+# Axis NAMES per vertex — these are the seeds for synthesis.
+# The synthesizer turns these words into property vectors
+# using the equation/domain corpus. If a better word exists,
+# change it here and the properties update automatically.
+VERTEX_AXIS_SEEDS = {
+    "000": "food water crop harvest nutrient soil",
+    "001": "energy grid power generation storage fuel",
+    "010": "social community trust cohesion cooperation",
+    "011": "institutional governance authority legitimacy coordination",
+    "100": "knowledge transmission learning memory oral apprenticeship",
+    "101": "infrastructure roads bridges pipes repair maintenance",
+    "110": "food community local market cooperative distribution",
+    "111": "convergent stable unified equilibrium balanced holistic",
 }
 
-# Bridge names → substrate property clusters
-BRIDGE_PROPERTY_MAP = {
-    "consciousness": ["pattern_recognition", "information_measure", "memory_fading",
-                       "self_similarity"],
-    "wave": ["frequency_decomposition", "resonance", "synchronization",
-             "spatial_coupling"],
-    "structure": ["optimal_packing", "proportion_stability", "fractal_nesting",
-                  "self_similarity"],
-    "flow": ["gradient_flow", "diffusion_on_graphs", "spatial_coupling",
-             "pressure_dynamics"],
-    "growth": ["population_dynamics", "carrying_capacity", "spiral_growth",
-               "fibonacci_scaling"],
-    "decay": ["decay_modeling", "half_life", "memory_fading"],
-    "network": ["network_structure", "community_detection", "diffusion_on_graphs",
-                "synchronization"],
-    "energy": ["energy_conservation", "energy_minimization", "energy_transfer",
-               "budget_constraint"],
-    "information": ["information_measure", "compression", "pattern_recognition",
-                    "uncertainty_quantification"],
-    "symmetry": ["self_similarity", "proportion_stability", "resonance_avoidance",
-                 "fractal_nesting"],
+# Operator DESCRIPTIONS — seeds for synthesis.
+OPERATOR_SEEDS = {
+    "O": "origin center radial symmetric attractor collapse equilibrium stable",
+    "I": "identity invariant persistent proportion stable preserved unchanged",
+    "X": "exchange bidirectional flow coupling transfer synchronize oscillate",
+    "Δ": "change gradient difference delta transform decay pressure dissipate",
 }
+
+# Bridge name DESCRIPTIONS — seeds for synthesis.
+BRIDGE_SEEDS = {
+    "consciousness": "awareness pattern recognition memory self-reflection information",
+    "wave": "frequency oscillation resonance propagation interference amplitude",
+    "structure": "geometry packing stability fractal nested self-similar solid",
+    "flow": "gradient diffusion transport pressure current stream",
+    "growth": "population expand scale spiral branch fibonacci reproduce",
+    "decay": "loss fade erode half-life decompose memory die",
+    "network": "graph connection community cluster mesh distributed topology",
+    "energy": "conservation power transfer budget thermodynamic minimize",
+    "information": "entropy signal compress encode measure uncertainty noise",
+    "symmetry": "invariant proportion golden ratio self-similar resonance avoid",
+}
+
+
+class DerivedMappings:
+    """
+    Replaces hand-curated VERTEX_MAP, OPERATOR_MAP, BRIDGE_PROPERTY_MAP.
+
+    Takes the seed words above and runs them through the VectorSynthesizer
+    to produce property vectors. The synthesizer builds its associations
+    from equation and domain descriptions — so the mappings are grounded
+    in the actual physics library, not someone's guesses.
+
+    Add a new equation about turbulence → "turbulence" in operator Δ's
+    seed text now picks up turbulence-related properties automatically.
+    No manual update needed.
+
+    The static maps were the training wheels. This is the bike.
+    """
+
+    def __init__(self, synthesizer: 'VectorSynthesizer'):
+        self.synthesizer = synthesizer
+        self.vertex_properties: Dict[str, Dict[str, float]] = {}
+        self.operator_properties: Dict[str, Dict[str, float]] = {}
+        self.bridge_properties: Dict[str, Dict[str, float]] = {}
+        self._derive_all()
+
+    def _derive_all(self):
+        """Derive all property mappings from seed text."""
+        for bits, seed_text in VERTEX_AXIS_SEEDS.items():
+            self.vertex_properties[bits] = self.synthesizer.synthesize(seed_text)
+
+        for op, seed_text in OPERATOR_SEEDS.items():
+            self.operator_properties[op] = self.synthesizer.synthesize(seed_text)
+
+        for bridge, seed_text in BRIDGE_SEEDS.items():
+            self.bridge_properties[bridge] = self.synthesizer.synthesize(seed_text)
+
+    def get_vertex_props(self, bits: str) -> Dict[str, float]:
+        return self.vertex_properties.get(bits, {})
+
+    def get_operator_props(self, op: str) -> Dict[str, float]:
+        return self.operator_properties.get(op, {})
+
+    def get_bridge_props(self, bridge: str) -> Dict[str, float]:
+        # Known bridge → use pre-derived
+        if bridge in self.bridge_properties:
+            return self.bridge_properties[bridge]
+        # Unknown bridge → synthesize on the fly
+        return self.synthesizer.synthesize(bridge)
+
+    def report(self) -> str:
+        """Show what was derived for transparency."""
+        lines = []
+        lines.append("DERIVED VERTEX MAPPINGS:")
+        for bits, props in sorted(self.vertex_properties.items()):
+            top = sorted(props.items(), key=lambda x: -x[1])[:5]
+            top_str = ", ".join(f"{p}={w:.2f}" for p, w in top)
+            lines.append(f"  {bits} ({VERTEX_AXIS_SEEDS[bits].split()[0]}): {top_str}")
+
+        lines.append("\nDERIVED OPERATOR MAPPINGS:")
+        for op, props in self.operator_properties.items():
+            top = sorted(props.items(), key=lambda x: -x[1])[:5]
+            top_str = ", ".join(f"{p}={w:.2f}" for p, w in top)
+            lines.append(f"  {op}: {top_str}")
+
+        lines.append("\nDERIVED BRIDGE MAPPINGS:")
+        for bridge, props in sorted(self.bridge_properties.items()):
+            top = sorted(props.items(), key=lambda x: -x[1])[:4]
+            top_str = ", ".join(f"{p}={w:.2f}" for p, w in top)
+            lines.append(f"  {bridge}: {top_str}")
+
+        return "\n".join(lines)
 
 
 # =============================================================================
@@ -222,6 +282,11 @@ class GeoBinBridge:
 
     def __init__(self):
         self.reasoner = SubstrateReasoner() if HAS_SUBSTRATE else None
+        # Derive all mappings from the equation/domain corpus
+        if self.reasoner:
+            self.mappings = DerivedMappings(self.reasoner.synthesizer)
+        else:
+            self.mappings = None
 
     # ----- Pattern → Substrate Properties -----
 
@@ -248,24 +313,30 @@ class GeoBinBridge:
 
         properties: Dict[str, float] = {}
 
-        # Signal 1: Vertex direction
-        vertex_info = VERTEX_MAP.get(vertex_bits, VERTEX_MAP["000"])
-        axis = vertex_info.get("axis", "")
-        # Each axis maps to domain-related properties
-        axis_properties = self._axis_to_properties(axis)
-        for prop, weight in axis_properties.items():
+        # Signal 1: Vertex direction (derived from corpus)
+        if self.mappings:
+            vertex_props = self.mappings.get_vertex_props(vertex_bits)
+        else:
+            vertex_props = {}
+        for prop, weight in vertex_props.items():
             properties[prop] = properties.get(prop, 0) + weight
 
-        # Signal 2: Operator
-        op_info = OPERATOR_MAP.get(operator, OPERATOR_MAP["O"])
-        for prop in op_info["properties"]:
-            properties[prop] = properties.get(prop, 0) + 1.0
+        # Signal 2: Operator (derived from corpus)
+        if self.mappings:
+            op_props = self.mappings.get_operator_props(operator)
+        else:
+            op_props = {}
+        for prop, weight in op_props.items():
+            properties[prop] = properties.get(prop, 0) + weight
 
-        # Signal 3: Bridges
+        # Signal 3: Bridges (derived from corpus, or synthesized on the fly)
         for bridge_name in bridges:
-            bridge_props = BRIDGE_PROPERTY_MAP.get(bridge_name, [])
-            for prop in bridge_props:
-                properties[prop] = properties.get(prop, 0) + 0.7
+            if self.mappings:
+                bridge_props = self.mappings.get_bridge_props(bridge_name)
+            else:
+                bridge_props = {}
+            for prop, weight in bridge_props.items():
+                properties[prop] = properties.get(prop, 0) + weight * 0.7
 
         # Phi coherence amplifier: high coherence boosts phi-related properties
         phi_props = ["self_similarity", "optimal_packing", "fibonacci_scaling",
@@ -294,44 +365,11 @@ class GeoBinBridge:
 
         return properties
 
-    def _axis_to_properties(self, axis: str) -> Dict[str, float]:
-        """Map an octahedral axis name to substrate properties."""
-        axis_map = {
-            "food_water": {
-                "carrying_capacity": 0.9, "population_dynamics": 0.8,
-                "decay_modeling": 0.7, "resource_competition": 0.8,
-            },
-            "energy": {
-                "energy_conservation": 1.0, "gradient_flow": 0.8,
-                "budget_constraint": 0.7, "synchronization": 0.5,
-            },
-            "social": {
-                "synchronization": 0.8, "community_detection": 0.7,
-                "network_structure": 0.6, "diversity_measure": 0.5,
-            },
-            "institutional": {
-                "equilibrium_seeking": 0.7, "uncertainty_quantification": 0.6,
-                "budget_constraint": 0.5, "community_detection": 0.5,
-            },
-            "knowledge": {
-                "decay_modeling": 0.9, "memory_fading": 0.8,
-                "diffusion_on_graphs": 0.7, "network_structure": 0.6,
-                "half_life": 0.5,
-            },
-            "infrastructure": {
-                "network_structure": 0.9, "spatial_coupling": 0.8,
-                "pressure_dynamics": 0.6, "gradient_flow": 0.5,
-            },
-            "food_social": {
-                "carrying_capacity": 0.7, "community_detection": 0.6,
-                "resource_competition": 0.5, "synchronization": 0.5,
-            },
-            "convergent": {
-                "self_similarity": 0.8, "convergent_ratio": 0.7,
-                "equilibrium_seeking": 0.6, "energy_conservation": 0.5,
-            },
-        }
-        return axis_map.get(axis, {})
+    def _vertex_props_for_bits(self, bits: str) -> Dict[str, float]:
+        """Get derived property vector for a vertex. Falls back to synthesis."""
+        if self.mappings:
+            return self.mappings.get_vertex_props(bits)
+        return {}
 
     # ----- Properties → Pattern (reverse) -----
 
@@ -341,30 +379,35 @@ class GeoBinBridge:
         Given substrate properties, find the best GEIS encoding.
         Reverse of pattern_to_properties.
         """
-        # Find best operator
+        prop_set = set(properties)
+
+        # Find best operator (derived)
         best_op = "O"
-        best_op_score = 0
-        for op, info in OPERATOR_MAP.items():
-            score = len(set(info["properties"]) & set(properties))
-            if score > best_op_score:
-                best_op = op
-                best_op_score = score
+        best_op_score = 0.0
+        if self.mappings:
+            for op, op_props in self.mappings.operator_properties.items():
+                score = sum(op_props.get(p, 0) for p in properties)
+                if score > best_op_score:
+                    best_op = op
+                    best_op_score = score
 
-        # Find best vertex
+        # Find best vertex (derived)
         best_vertex = "000"
-        best_vertex_score = 0
-        for bits, info in VERTEX_MAP.items():
-            axis_props = self._axis_to_properties(info.get("axis", ""))
-            score = len(set(axis_props.keys()) & set(properties))
-            if score > best_vertex_score:
-                best_vertex = bits
-                best_vertex_score = score
+        best_vertex_score = 0.0
+        if self.mappings:
+            for bits, v_props in self.mappings.vertex_properties.items():
+                score = sum(v_props.get(p, 0) for p in properties)
+                if score > best_vertex_score:
+                    best_vertex = bits
+                    best_vertex_score = score
 
-        # Find bridges
+        # Find bridges (derived)
         bridges = []
-        for bridge_name, bridge_props in BRIDGE_PROPERTY_MAP.items():
-            if len(set(bridge_props) & set(properties)) >= 2:
-                bridges.append(bridge_name)
+        if self.mappings:
+            for bridge_name, b_props in self.mappings.bridge_properties.items():
+                overlap = sum(1 for p in properties if b_props.get(p, 0) > 0.1)
+                if overlap >= 2:
+                    bridges.append(bridge_name)
 
         encoding = f"{best_vertex}|{best_op}"
         return GEISPattern.from_encoding(
@@ -391,7 +434,7 @@ class GeoBinBridge:
         seed = [0.1] * 6
 
         # Primary direction from vertex bits
-        vertex_info = VERTEX_MAP.get(vertex_bits, VERTEX_MAP["000"])
+        vertex_info = VERTEX_GEOMETRY.get(vertex_bits, VERTEX_GEOMETRY["000"])
         idx = vertex_info["index"]
         if 0 <= idx < 6:
             seed[idx] = 0.5 + 0.3 * phi_coherence
@@ -526,10 +569,10 @@ class GeoBinBridge:
 
         print(f"\n  Encoding: {pattern['geometric_encoding']}")
         print(f"  Vertex:   {pattern['vertex_bits']} → "
-              f"{VERTEX_MAP.get(pattern['vertex_bits'], {}).get('direction', '?')} "
-              f"({VERTEX_MAP.get(pattern['vertex_bits'], {}).get('axis', '?')})")
+              f"{VERTEX_GEOMETRY.get(pattern['vertex_bits'], {}).get('direction', '?')} "
+              f"(seed: {VERTEX_AXIS_SEEDS.get(pattern['vertex_bits'], '?').split()[0]})")
         print(f"  Operator: {pattern['operator']} → "
-              f"{OPERATOR_MAP.get(pattern['operator'], {}).get('name', '?')}")
+              f"{OPERATOR_SEEDS.get(pattern['operator'], '?').split()[0]}")
         print(f"  Phi:      {pattern['phi_coherence']:.2f}")
         if pattern['bridges']:
             print(f"  Bridges:  {', '.join(pattern['bridges'])}")
@@ -569,6 +612,13 @@ if __name__ == "__main__":
     print("=" * 66)
 
     bridge = GeoBinBridge()
+
+    # Show what was derived (transparency)
+    if bridge.mappings:
+        print(f"\n{'─'*66}")
+        print("  DERIVED MAPPINGS (from equation/domain corpus, not hand-coded)")
+        print(f"{'─'*66}\n")
+        print(f"  {bridge.mappings.report()}")
 
     # Test patterns from the fieldlink schema
     patterns = [
