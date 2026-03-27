@@ -1,0 +1,175 @@
+{
+  "fieldlink": {
+    "version": "1.0",
+    "updated": "2026-03-27T00:00:00Z",
+    "role": ["resilience_sim", "substrate_reasoning", "sar_coordination"],
+    "description": "Resilience simulation framework — city-scale resilience, seed protocol mesh networking, substrate-first reasoning, SAR drone coordination, knowledge ancestry.",
+
+    "sources": [
+      {
+        "name": "geometric-to-binary",
+        "repo": "https://github.com/JinnZ2/geometric-to-binary",
+        "ref": "main",
+        "direction": "bidirectional",
+        "relation": "geometric_encoding_bridge",
+        "description": "GEIS octahedral encoding ↔ substrate properties. The geobin_bridge.py module translates between geometric vertex bits and the equation field.",
+        "entities_consumed": ["GEIS.ENCODING", "SHAPE.OCTA", "CONST.PHI", "BRIDGE.BINARY", "TOPO.VORTEX_MEMORY"],
+        "entities_exported": [
+          "SUBSTRATE.PROPERTY_VECTOR",
+          "EQUATION.FIELD_OVERLAP",
+          "SEED.PROTOCOL_PACKET",
+          "MESH.NODE_STATE",
+          "DNA.KNOWLEDGE_FIELD"
+        ],
+        "consent": { "license": "CC0", "share_ok": true }
+      },
+      {
+        "name": "trdap",
+        "repo": "https://github.com/JinnZ2/TRDAP",
+        "ref": "main",
+        "direction": "bidirectional",
+        "relation": "transport_resilience",
+        "description": "Transport resilience data and protocol. Corridor observation data (Superior WI → Tomah WI) feeds ground truth calibration for city models.",
+        "entities_consumed": ["TRDAP.CORRIDOR_DATA", "TRDAP.ROUTE_OBSERVATION"],
+        "entities_exported": [
+          "RESILIENCE.CITY_MODEL",
+          "RESILIENCE.COUPLING_EDGE",
+          "RESILIENCE.KNOWLEDGE_DECAY",
+          "MESH.GRID_FAILURE_SIM"
+        ],
+        "consent": { "license": "CC0", "share_ok": true }
+      },
+      {
+        "name": "seed-physics",
+        "repo": "https://github.com/JinnZ2/Seed-physics",
+        "ref": "main",
+        "direction": "bidirectional",
+        "relation": "seed_expansion_core",
+        "description": "NumPy reference implementation of octahedral seed expansion. sim/seed_protocol.py is the stdlib port.",
+        "entities_consumed": ["SEED.EXPANSION_RULES", "SEED.OCTAHEDRAL_DIRS"],
+        "entities_exported": [
+          "SEED.STDLIB_PROTOCOL",
+          "SEED.MESH_SIMULATION",
+          "SEED.CITY_BRIDGE"
+        ],
+        "consent": { "license": "MIT", "share_ok": true }
+      },
+      {
+        "name": "living-intelligence-database",
+        "repo": "https://github.com/JinnZ2/Living-Intelligence-Database",
+        "ref": "main",
+        "direction": "inbound",
+        "relation": "knowledge_teachers",
+        "description": "Living intelligence ontology — 38 intelligences across animal, plant, crystal, plasma, energy, shape, temporal. The root nodes of the knowledge ancestry graph.",
+        "entities_consumed": [
+          "INTELLIGENCE.ANIMAL",
+          "INTELLIGENCE.PLANT",
+          "INTELLIGENCE.CRYSTAL",
+          "INTELLIGENCE.ENERGY",
+          "INTELLIGENCE.SHAPE",
+          "INTELLIGENCE.TEMPORAL",
+          "INTELLIGENCE.SYNERGY_GRAPH",
+          "INTELLIGENCE.EXPANDER_RULES"
+        ],
+        "entities_exported": [
+          "SUBSTRATE.LIVING_EQUATIONS",
+          "DNA.TEACHER_GRAPH"
+        ],
+        "consent": { "license": "MIT", "share_ok": true }
+      },
+      {
+        "name": "mandala",
+        "repo": "https://github.com/JinnZ2/Mandala-Computing",
+        "ref": "main",
+        "direction": "inbound",
+        "relation": "computation_patterns",
+        "description": "Mandala computation engine. Patterns consumed via geobin_bridge as GEIS encodings.",
+        "entities_consumed": ["SHAPE.OCTA", "CONST.PHI", "CAP.SEED_EXPANSION"],
+        "consent": { "license": "MIT", "share_ok": true }
+      },
+      {
+        "name": "rosetta",
+        "repo": "https://github.com/JinnZ2/Rosetta-Shape-Core",
+        "ref": "main",
+        "direction": "inbound",
+        "relation": "shape_ontology",
+        "description": "Cross-domain shape definitions and bridges.",
+        "entities_consumed": ["SHAPE.OCTAHEDRON", "BRIDGE.ROSETTA"],
+        "consent": { "license": "CC-BY-4.0", "share_ok": true }
+      },
+      {
+        "name": "biogrid",
+        "repo": "https://github.com/JinnZ2/BioGrid2.0",
+        "ref": "main",
+        "direction": "inbound",
+        "relation": "biological_grid",
+        "description": "Biological grid patterns. Consumed as living intelligence domain data.",
+        "entities_consumed": ["BIOGRID.ATLAS"],
+        "consent": { "license": "CC-BY-4.0", "share_ok": true }
+      }
+    ],
+
+    "local_modules": {
+      "sim/seed_protocol.py": {
+        "provides": ["SEED.STDLIB_PROTOCOL", "SEED.MESH_SIMULATION"],
+        "description": "Stdlib-only octahedral seed expansion, 21-byte packets, mesh networking"
+      },
+      "sim/seed_mesh.py": {
+        "provides": ["MESH.GRID_FAILURE_SIM", "MESH.CASCADE_MITIGATION"],
+        "description": "City resilience mesh bridge — grid failure simulation"
+      },
+      "sim/cities/coupling.py": {
+        "provides": ["RESILIENCE.COUPLING_EDGE", "RESILIENCE.KNOWLEDGE_DECAY"],
+        "description": "Cross-domain shock propagation and knowledge countdown clocks"
+      },
+      "KnowledgeDNA/substrate.py": {
+        "provides": ["SUBSTRATE.PROPERTY_VECTOR", "SUBSTRATE.REASONING"],
+        "description": "Substrate-first reasoning — decompose to physics, propagate across domains"
+      },
+      "KnowledgeDNA/equation_field.py": {
+        "provides": ["EQUATION.FIELD_OVERLAP", "EQUATION.MULTI_PURPOSE_REUSE"],
+        "description": "14 equations × 15 domains, overlap scoring, bridge discovery"
+      },
+      "KnowledgeDNA/knowledge_dna.py": {
+        "provides": ["DNA.KNOWLEDGE_FIELD", "DNA.FRAGILITY_ANALYSIS"],
+        "description": "Knowledge as field propagation — channel coupling, dormancy, typed edges"
+      },
+      "KnowledgeDNA/geobin_bridge.py": {
+        "provides": ["BRIDGE.GEIS_TO_SUBSTRATE"],
+        "description": "GEIS vertex bits ↔ substrate properties bidirectional bridge"
+      },
+      "KnowledgeDNA/living_intelligence.py": {
+        "provides": ["DNA.TEACHER_GRAPH", "SUBSTRATE.LIVING_EQUATIONS"],
+        "description": "Living Intelligence Database connector — 38 teachers as equations"
+      },
+      "SAR/workflow_bridge.py": {
+        "provides": ["SAR.GEOMETRIC_PIPELINE", "SAR.WAYPOINT_EXPORT"],
+        "description": "Stdlib-only geometric swarm coordination with 3D allocation"
+      },
+      "GoatHerd/herd.py": {
+        "provides": ["HERD.GRAZING_ROTATION", "HERD.HEALTH_TRACKING"],
+        "description": "Village goat herding assistant — logistic growth, zone scoring"
+      }
+    },
+
+    "entity_map": {
+      "_comment": "How entities from external repos map to local substrate properties",
+      "GEIS.ENCODING": ["pattern_recognition", "compression", "information_measure"],
+      "SHAPE.OCTA": ["optimal_packing", "resonance_avoidance", "self_similarity"],
+      "CONST.PHI": ["fibonacci_scaling", "resonance_avoidance", "spiral_growth", "proportion_stability"],
+      "SEED.EXPANSION_RULES": ["spiral_growth", "energy_conservation", "fibonacci_scaling"],
+      "INTELLIGENCE.SYNERGY_GRAPH": ["network_structure", "spatial_coupling", "synchronization"],
+      "TRDAP.CORRIDOR_DATA": ["gradient_flow", "spatial_coupling", "decay_modeling"]
+    },
+
+    "merge": {
+      "order": ["local", "geometric-to-binary", "trdap", "seed-physics", "living-intelligence-database"],
+      "strategy": "deep-merge"
+    },
+
+    "offline": true,
+    "cache_dir": ".fieldcache",
+    "integrity": { "enabled": true, "hash": "sha256", "allow_missing": true },
+    "consent": { "license": "CC0", "share_ok": true, "redact_rules": ["**/private/**", "*.secrets.json"] }
+  }
+}
