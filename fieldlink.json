@@ -40,6 +40,26 @@
         "consent": { "license": "CC0", "share_ok": true }
       },
       {
+        "name": "be2-communication",
+        "repo": "https://github.com/JinnZ2/BE2-communication",
+        "ref": "main",
+        "direction": "bidirectional",
+        "relation": "transport_accessibility",
+        "description": "Classic BT and BLE mesh transport for accessibility. Sensory adaptation, emergency reach, low-power mesh communication for underserved communities.",
+        "entities_consumed": [
+          "BE2.CLASSIC_BT_ACCESSIBILITY",
+          "BE2.BLE_MESH_TRANSPORT",
+          "BE2.SENSORY_ADAPTATION",
+          "BE2.EMERGENCY_REACH"
+        ],
+        "entities_exported": [
+          "SEED.STDLIB_PROTOCOL",
+          "MESH.NODE_STATE",
+          "SAR.GEOMETRIC_PIPELINE"
+        ],
+        "consent": { "license": "CC0", "share_ok": true }
+      },
+      {
         "name": "seed-physics",
         "repo": "https://github.com/JinnZ2/Seed-physics",
         "ref": "main",
@@ -159,11 +179,15 @@
       "CONST.PHI": ["fibonacci_scaling", "resonance_avoidance", "spiral_growth", "proportion_stability"],
       "SEED.EXPANSION_RULES": ["spiral_growth", "energy_conservation", "fibonacci_scaling"],
       "INTELLIGENCE.SYNERGY_GRAPH": ["network_structure", "spatial_coupling", "synchronization"],
-      "TRDAP.CORRIDOR_DATA": ["gradient_flow", "spatial_coupling", "decay_modeling"]
+      "TRDAP.CORRIDOR_DATA": ["gradient_flow", "spatial_coupling", "decay_modeling"],
+      "BE2.CLASSIC_BT_ACCESSIBILITY": ["information_measure", "sensory_adaptation", "emergency_reach"],
+      "BE2.BLE_MESH_TRANSPORT": ["network_structure", "spatial_coupling", "compression"],
+      "BE2.SENSORY_ADAPTATION": ["pattern_recognition", "frequency_decomposition", "information_measure"],
+      "BE2.EMERGENCY_REACH": ["network_structure", "synchronization", "gradient_flow"]
     },
 
     "merge": {
-      "order": ["local", "geometric-to-binary", "trdap", "seed-physics", "living-intelligence-database"],
+      "order": ["local", "geometric-to-binary", "trdap", "be2-communication", "seed-physics", "living-intelligence-database"],
       "strategy": "deep-merge"
     },
 
