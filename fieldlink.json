@@ -60,6 +60,30 @@
         "consent": { "license": "CC0", "share_ok": true }
       },
       {
+        "name": "universal-redesign-algorithm",
+        "repo": "https://github.com/JinnZ2/Universal-Redesign-Algorithm-",
+        "ref": "main",
+        "direction": "bidirectional",
+        "relation": "redesign_orchestrator",
+        "description": "Nature's operating system applied to infrastructure redesign. Orchestrates biological principles across energy, water, food, supply chain. Crisis geology and urban grid feed directly into URA's redesign planning.",
+        "entities_consumed": [
+          "URA.REDESIGN_SCHEMA",
+          "URA.BIO_HYBRID_EQUATIONS",
+          "URA.STRESS_POINTS",
+          "URA.ENERGY_ARCHITECTURE"
+        ],
+        "entities_exported": [
+          "RESILIENCE.CRISIS_TOPOLOGY",
+          "RESILIENCE.COUPLING_EDGE",
+          "EQUATION.FIELD_OVERLAP",
+          "SUBSTRATE.PROPERTY_VECTOR",
+          "SEED.STDLIB_PROTOCOL",
+          "DNA.TEACHER_GRAPH",
+          "MESH.GRID_FAILURE_SIM"
+        ],
+        "consent": { "license": "CC0", "share_ok": true }
+      },
+      {
         "name": "seed-physics",
         "repo": "https://github.com/JinnZ2/Seed-physics",
         "ref": "main",
@@ -183,11 +207,15 @@
       "BE2.CLASSIC_BT_ACCESSIBILITY": ["information_measure", "sensory_adaptation", "emergency_reach"],
       "BE2.BLE_MESH_TRANSPORT": ["network_structure", "spatial_coupling", "compression"],
       "BE2.SENSORY_ADAPTATION": ["pattern_recognition", "frequency_decomposition", "information_measure"],
-      "BE2.EMERGENCY_REACH": ["network_structure", "synchronization", "gradient_flow"]
+      "BE2.EMERGENCY_REACH": ["network_structure", "synchronization", "gradient_flow"],
+      "URA.REDESIGN_SCHEMA": ["energy_conservation", "carrying_capacity", "equilibrium_seeking", "population_dynamics"],
+      "URA.BIO_HYBRID_EQUATIONS": ["self_similarity", "fibonacci_scaling", "optimal_packing", "energy_minimization"],
+      "URA.STRESS_POINTS": ["decay_modeling", "pressure_dynamics", "gradient_flow", "resource_competition"],
+      "URA.ENERGY_ARCHITECTURE": ["energy_conservation", "network_structure", "gradient_flow", "synchronization"]
     },
 
     "merge": {
-      "order": ["local", "geometric-to-binary", "trdap", "be2-communication", "seed-physics", "living-intelligence-database"],
+      "order": ["local", "geometric-to-binary", "trdap", "be2-communication", "universal-redesign-algorithm", "seed-physics", "living-intelligence-database"],
       "strategy": "deep-merge"
     },
 
