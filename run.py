@@ -85,6 +85,18 @@ MODULES = {
         "desc": "38 living intelligences from GitHub. Bee, mycelium, quartz, decay.",
     },
 
+    # --- Crisis Geology ---
+    "14": {
+        "name": "Crisis Geology (geothermal transduction)",
+        "cmd": [sys.executable, "-m", "sim.crisis_geology"],
+        "desc": "Borehole transducers: 6 mineral coupling paths. The rock is the sensor.",
+    },
+    "15": {
+        "name": "Urban Grid (infrastructure retrofit)",
+        "cmd": [sys.executable, "-m", "sim.urban_grid"],
+        "desc": "Water pipes, basements, garages as transducer network. Data > power.",
+    },
+
     # --- GoatHerd ---
     "13": {
         "name": "GoatHerd (village herding assistant)",
@@ -106,6 +118,7 @@ def main():
         ("Mesh Networking", ["3", "4"]),
         ("Search and Rescue", ["5", "6", "7"]),
         ("Knowledge + Reasoning", ["8", "9", "10", "11", "12"]),
+        ("Crisis Geology", ["14", "15"]),
         ("Field Tools", ["13"]),
     ]
 
@@ -123,7 +136,7 @@ def main():
 
     while True:
         try:
-            choice = input("  Choose module (1-13, a, q): ").strip().lower()
+            choice = input("  Choose module (1-14, a, q):").strip().lower()
         except (EOFError, KeyboardInterrupt):
             break
 
