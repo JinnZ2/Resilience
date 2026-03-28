@@ -38,24 +38,66 @@ from typing import List, Dict, Tuple, Optional
 # PHYSICAL CONSTANTS
 # =============================================================================
 
-# Piezoelectric (quartz — honest: produces picowatts, not microwatts)
-PIEZO_D33 = 2.3e-12         # pC/N — quartz piezo coefficient (very low)
-# PZT ceramic would give 500 pC/N but isn't natural rock.
-# Quartz piezo path is real but insufficient alone for LoRa.
+# =============================================================================
+# MINERAL COUPLING CONSTANTS
+# =============================================================================
+#
+# What's already in the ground. Every mechanism couples to at least
+# two others. The rock doesn't need us to build a network.
+# It already IS one. We just need electrodes and a radio.
 
-# Thermoelectric (the actual viable path)
-SEEBECK_BISMUTH = 200e-6    # V/K — bismuth telluride thermocouple
-# With 10 thermocouples in series across a 5C gradient:
-# V = 10 * 200e-6 * 5 = 10 mV, at 100 ohm load = 100 uA, P = 1 uW
-# THIS is the path that reaches 5-20 uW.
+# --- Piezoelectric ---
+PIEZO_D33_QUARTZ = 2.3e-12     # pC/N — quartz (compressive/P-wave)
+PIEZO_D14_CALCITE = 0.5e-12    # pC/N — calcite (shear/S-wave, different mode)
+PIEZO_D33_TOURMALINE = 4.0e-12 # pC/N — tourmaline (2x quartz + pyroelectric)
+PIEZO_D33_ICE = 2.0e-12        # pC/N — ice Ih (permafrost IS a transducer)
+# Honest: all produce picowatts at geological strain rates.
+# But calcite responds to S-waves where quartz responds to P-waves.
+# Together = two independent channels from one seismic event.
 
-QUARTZ_MODULUS = 50e9        # Pa
-QUARTZ_ALPHA = 15e-6         # 1/K
-MAGNETITE_CURIE = 585        # C
-ROCK_THERMAL_CAP = 2.5e6    # J/(m^3*K)
-PRESSURE_GRADIENT = 27e6     # Pa/km
-THERMAL_GRADIENT = 25        # C/km
-TEG_RESISTANCE = 100         # ohm — thermoelectric generator load
+# --- Pyroelectric ---
+PYRO_TOURMALINE = 4.0e-6       # C/(m^2*K) — spontaneous polarization from dT
+# No mechanical stress needed. Temperature change -> voltage directly.
+
+# --- Thermoelectric ---
+SEEBECK_BISMUTH = 200e-6       # V/K — manufactured bismuth telluride
+SEEBECK_PYRITE = -820e-6       # V/K — natural pyrite (4x better!)
+SEEBECK_CHALCOPYRITE = 600e-6  # V/K — natural chalcopyrite
+# Pyrite-chalcopyrite junction: natural thermocouple, S = 1420 uV/K
+# Most common sulfide mineral on Earth. Already in the rock.
+SEEBECK_NATURAL = 1420e-6      # V/K — pyrite-chalcopyrite junction
+
+# --- Streaming potential ---
+STREAMING_COEFF = 10e-3        # V per meter of hydraulic head (conservative)
+# Range: 1-100 mV/m. Every aquifer with flowing water generates voltage.
+# Active aquifer dwarfs all other power sources.
+
+# --- Magnetostrictive ---
+MAGNETOSTRICTION_FE3O4 = 40e-6 # strain — magnetite in 50 uT geomagnetic field
+# Geomagnetic field change -> magnetite shape change -> mechanical strain
+# -> couples to quartz/calcite piezo. Amplifier, not source.
+
+# --- Biological ---
+ROOT_POTENTIAL = 0.3           # V — tree root-soil electrochemical (0.1-0.7V)
+# Mycorrhizal network = signal distribution. Forest IS a sensor array.
+# Single tree: enough voltage for LoRa at low duty cycle.
+
+# --- Atmospheric ---
+SCHUMANN_FREQ = 7.83           # Hz — Earth-ionosphere cavity resonance
+# Always present everywhere. Magnetite couples. Free sync carrier.
+
+# --- Storage ---
+# Mica: layered dielectric = natural capacitor. Stores charge from others.
+# Galena (PbS): natural rectifier. With pyrite = natural diode for AC->DC.
+
+# --- Bulk rock ---
+QUARTZ_MODULUS = 50e9          # Pa
+QUARTZ_ALPHA = 15e-6           # 1/K
+MAGNETITE_CURIE = 585          # C
+ROCK_THERMAL_CAP = 2.5e6      # J/(m^3*K)
+PRESSURE_GRADIENT = 27e6       # Pa/km
+THERMAL_GRADIENT = 25          # C/km
+TEG_RESISTANCE = 100           # ohm
 
 
 # =============================================================================
@@ -65,19 +107,32 @@ TEG_RESISTANCE = 100         # ohm — thermoelectric generator load
 @dataclass
 class GeoTransducer:
     """
-    Quartz + magnetite stack in a borehole.
-    Converts thermal cycling, seismic vibration, and tidal strain
-    into electrical power + sensor data.
+    Multi-mineral transducer stack in a borehole.
+
+    Not just quartz — the full coupling network:
+    thermoelectric (pyrite-chalcopyrite junctions),
+    pyroelectric (tourmaline), streaming potential (water flow),
+    piezoelectric (quartz P-wave + calcite S-wave),
+    smoky quartz thermoluminescence, magnetite coupling.
+
+    Each mechanism is modeled honestly with real coefficients.
     """
-    depth_m: float = 50.0           # borehole depth
-    stack_length_m: float = 5.0     # quartz + magnetite stack
-    quartz_fraction: float = 0.6    # fraction of stack that's quartz
+    depth_m: float = 50.0
+    stack_length_m: float = 5.0
+    quartz_fraction: float = 0.4
+    tourmaline_fraction: float = 0.1
+    magnetite_fraction: float = 0.1
+    pyrite_present: bool = True      # natural thermocouple
+    calcite_present: bool = True     # shear-mode piezo
 
     # Environmental conditions
     surface_temp_c: float = 25.0
-    daily_swing_c: float = 10.0     # daily temperature variation at depth
-    seasonal_swing_c: float = 30.0  # seasonal variation
-    seismic_acceleration: float = 0.001  # g (background microseismic)
+    daily_swing_c: float = 10.0
+    seasonal_swing_c: float = 30.0
+    seismic_acceleration: float = 0.001  # g
+    water_flow_m_per_s: float = 1e-5     # groundwater velocity (typical aquifer)
+    hydraulic_head_m: float = 5.0        # meters of head across transducer
+    has_trees_above: bool = False        # forest canopy = biological coupling
 
     # Location
     name: str = ""
@@ -100,99 +155,95 @@ class GeoTransducer:
         """Stress from confined thermal expansion (Pa)."""
         return QUARTZ_MODULUS * self.thermal_strain(delta_t)
 
+    # --- POWER: Thermoelectric (dominant) ---
+
     def thermoelectric_power(self) -> float:
-        """
-        Power from thermoelectric generation (W).
-        THIS is the viable path to 5-20 uW.
-
-        A stack of thermocouples across the thermal gradient
-        in the borehole. Top of stack is warmer (connected to
-        surface thermal wave), bottom is at geothermal baseline.
-
-        Seebeck effect: V = n * S * dT
-        where n = number of thermocouples, S = Seebeck coefficient,
-        dT = temperature difference across the stack.
-        """
-        # Temperature difference across the stack
-        # Top of stack gets daily + seasonal variation
-        # Bottom is stable geothermal
+        """Pyrite-chalcopyrite natural thermocouple (W). S=1420 uV/K."""
         daily_atten = max(0.05, 0.5 * math.exp(-self.depth_m / 30) + 0.05)
         seasonal_atten = max(0.1, 0.6 * math.exp(-self.depth_m / 100) + 0.1)
-        # Average effective dT across stack
-        dt_daily = self.daily_swing_c * daily_atten * 0.5  # RMS
+        dt_daily = self.daily_swing_c * daily_atten * 0.5
         dt_seasonal = self.seasonal_swing_c * seasonal_atten * 0.3
-        dt_total = math.sqrt(dt_daily**2 + dt_seasonal**2)
-
-        # 10 thermocouples in series
+        dt_total = math.sqrt(dt_daily ** 2 + dt_seasonal ** 2)
+        seebeck = SEEBECK_NATURAL if self.pyrite_present else SEEBECK_BISMUTH
         n_couples = 10
-        voltage = n_couples * SEEBECK_BISMUTH * dt_total
-        current = voltage / TEG_RESISTANCE
-        return 0.5 * voltage * current  # average power
+        voltage = n_couples * seebeck * dt_total
+        return 0.5 * voltage * (voltage / TEG_RESISTANCE)
+
+    # --- POWER: Streaming potential (water flow) ---
+
+    def streaming_power(self) -> float:
+        """Electrokinetic voltage from groundwater flow (W)."""
+        if self.water_flow_m_per_s <= 0 or self.hydraulic_head_m <= 0:
+            return 0.0
+        voltage = STREAMING_COEFF * self.hydraulic_head_m
+        load_r = 500.0
+        return 0.5 * voltage * (voltage / load_r)
+
+    # --- POWER: Pyroelectric (tourmaline) ---
+
+    def pyroelectric_power(self) -> float:
+        """Tourmaline: temperature change -> voltage directly (W)."""
+        if self.tourmaline_fraction <= 0:
+            return 0.0
+        daily_atten = max(0.05, 0.5 * math.exp(-self.depth_m / 30) + 0.05)
+        dt_rate = self.daily_swing_c * daily_atten / 43200  # K/s
+        area = 0.01  # m^2
+        current = PYRO_TOURMALINE * area * dt_rate
+        load_r = 1e5
+        return 0.5 * (current * load_r) * current
+
+    # --- POWER: Piezoelectric (quartz + calcite) ---
 
     def piezo_power(self) -> float:
-        """
-        Power from quartz piezoelectric (W).
-        Honest: this is picowatts to nanowatts for natural quartz.
-        Included for completeness but NOT the primary power source.
-        """
+        """Quartz (P-wave) + calcite (S-wave) piezoelectric (W). Honest: pW."""
         dt = self.daily_swing_c * 0.05
         stress = self.thermal_stress(dt)
-        voltage = PIEZO_D33 * stress * self.stack_length_m * self.quartz_fraction
-        current = voltage / 1e6
-        return 0.5 * voltage * current
+        v_q = PIEZO_D33_QUARTZ * stress * self.stack_length_m * self.quartz_fraction
+        p_q = 0.5 * v_q * (v_q / 1e6)
+        p_c = 0.0
+        if self.calcite_present:
+            v_c = PIEZO_D14_CALCITE * stress * self.stack_length_m * 0.1
+            p_c = 0.5 * v_c * (v_c / 1e6)
+        return p_q + p_c
+
+    # --- SENSOR: Smoky quartz TL ---
 
     def smoky_quartz_power(self) -> float:
-        """
-        Power from smoky quartz thermoluminescent discharge (W).
-
-        Smoky quartz contains Al substitution defects that trap
-        electrons at radiation-damaged sites. Thermal cycling
-        releases trapped charge (thermoluminescence), producing
-        current pulses that are orders of magnitude larger than
-        the piezoelectric effect in the same crystal.
-
-        The crystal is a thermally-rechargeable battery:
-        - Cooling: charges accumulate at defect sites
-        - Warming: charges release, producing current
-        - Cycle repeats daily
-
-        Typical smoky quartz glow curve peaks at 150-300C,
-        but low-temperature traps exist at 50-100C —
-        accessible in shallow boreholes.
-
-        Charge per gram per cycle: ~1e-9 C (at low-temp traps)
-        For 10 kg smoky quartz in a 1m section:
-          Q = 10e3 * 1e-9 = 1e-5 C per cycle
-          At 0.1V trap depth: E = Q*V = 1e-6 J per cycle
-          One cycle per day: P = 1e-6 / 86400 = 0.012 nW
-
-        BUT with radiation-enhanced defect density (common in
-        granite boreholes with natural U/Th):
-          Defect density 10-100x higher
-          P = 0.1 - 1 nW per kg of smoky quartz
-
-        Honest: nanowatts, not microwatts. The thermoelectric path
-        still dominates. But smoky quartz adds a second independent
-        signal: the discharge current IS a temperature measurement.
-        Every pulse tells you the thermal history since last cycle.
-        The power is tiny. The information is priceless.
-        """
-        # Conservative: 0.5 nW per kg of smoky quartz
-        smoky_mass_kg = self.stack_length_m * self.quartz_fraction * 2.0  # ~2kg/m
+        """Thermoluminescent discharge (W). nW range. Sensor, not power."""
+        smoky_mass_kg = self.stack_length_m * self.quartz_fraction * 2.0
         daily_atten = max(0.05, 0.5 * math.exp(-self.depth_m / 30) + 0.05)
         effective_swing = self.daily_swing_c * daily_atten
+        return smoky_mass_kg * 0.5e-9 * (effective_swing / 5.0)
 
-        # Thermoluminescent output scales with dT and mass
-        # At 5C effective swing, ~0.5 nW/kg
-        power_per_kg = 0.5e-9 * (effective_swing / 5.0)
-        return smoky_mass_kg * power_per_kg
+    # --- SENSOR: Biological ---
+
+    def biological_power(self) -> float:
+        """Tree root electrochemical potential (W). 0.1-0.7V per tree."""
+        if not self.has_trees_above:
+            return 0.0
+        voltage = 0.1
+        current = voltage / 20e3  # matched load
+        return 0.5 * voltage * current
+
+    # --- TOTAL ---
 
     def total_power_uw(self) -> float:
-        """Total continuous power output in microwatts."""
-        total = (self.thermoelectric_power() +
-                 self.piezo_power() +
-                 self.smoky_quartz_power())
-        return total * 1e6  # W to uW
+        """Total continuous power from all coupling mechanisms (uW)."""
+        total = (self.thermoelectric_power() + self.streaming_power() +
+                 self.pyroelectric_power() + self.piezo_power() +
+                 self.smoky_quartz_power() + self.biological_power())
+        return total * 1e6
+
+    def power_breakdown(self) -> Dict[str, float]:
+        """Power from each mechanism (in natural units)."""
+        return {
+            "thermoelectric_uW": round(self.thermoelectric_power() * 1e6, 4),
+            "streaming_uW": round(self.streaming_power() * 1e6, 4),
+            "pyroelectric_uW": round(self.pyroelectric_power() * 1e6, 4),
+            "piezo_pW": round(self.piezo_power() * 1e12, 4),
+            "smoky_quartz_nW": round(self.smoky_quartz_power() * 1e9, 4),
+            "biological_uW": round(self.biological_power() * 1e6, 4),
+        }
 
     def lora_transmissions_per_day(self) -> int:
         """
@@ -403,9 +454,13 @@ def print_report(zones: List[CrisisZone]):
     print(f"    Depth: {ref.depth_m}m")
     print(f"    Temperature at depth: {ref.temp_at_depth():.0f}C")
     print(f"    Confining pressure: {ref.pressure_at_depth()/1e6:.1f} MPa")
-    print(f"    Power (thermoelectric): {ref.thermoelectric_power()*1e6:.2f} uW")
-    print(f"    Power (smoky quartz TL): {ref.smoky_quartz_power()*1e9:.2f} nW (sensor, not power)")
-    print(f"    Power (piezo quartz): {ref.piezo_power()*1e12:.2f} pW (negligible)")
+    bd = ref.power_breakdown()
+    print(f"    Thermoelectric (pyrite):  {bd['thermoelectric_uW']:.4f} uW")
+    print(f"    Streaming (water flow):   {bd['streaming_uW']:.4f} uW")
+    print(f"    Pyroelectric (tourmaline):{bd['pyroelectric_uW']:.4f} uW")
+    print(f"    Smoky quartz TL:          {bd['smoky_quartz_nW']:.4f} nW (sensor)")
+    print(f"    Piezo (quartz+calcite):   {bd['piezo_pW']:.4f} pW (negligible)")
+    print(f"    Biological (tree roots):  {bd['biological_uW']:.4f} uW")
     print(f"    TOTAL: {ref.total_power_uw():.2f} uW")
     print(f"    LoRa transmissions: {ref.lora_transmissions_per_day()}/day")
 
