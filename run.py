@@ -96,6 +96,11 @@ MODULES = {
         "cmd": [sys.executable, "-m", "sim.urban_grid"],
         "desc": "Water pipes, basements, garages as transducer network. Data > power.",
     },
+    "16": {
+        "name": "Crisis Topology (interface problems)",
+        "cmd": [sys.executable, "-m", "sim.crisis_topology"],
+        "desc": "8 crisis interfaces, leverage ranking, corridor deployment plan.",
+    },
 
     # --- GoatHerd ---
     "13": {
@@ -118,7 +123,7 @@ def main():
         ("Mesh Networking", ["3", "4"]),
         ("Search and Rescue", ["5", "6", "7"]),
         ("Knowledge + Reasoning", ["8", "9", "10", "11", "12"]),
-        ("Crisis Geology", ["14", "15"]),
+        ("Crisis Geology", ["14", "15", "16"]),
         ("Field Tools", ["13"]),
     ]
 
