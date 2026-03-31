@@ -2,7 +2,12 @@
 # Systematic Innovation for Power Increase
 # First-principles exploration of new couplings, captures, and loops
 
-import numpy as np
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except ImportError:
+    HAS_NUMPY = False
+    print(f"Note: {__file__} requires numpy for matrix operations")
 import itertools
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional, Tuple

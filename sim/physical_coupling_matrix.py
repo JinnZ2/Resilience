@@ -2,7 +2,12 @@
 # First-Principles Energy Coupling
 # Interactions between fundamental physical fields
 
-import numpy as np
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except ImportError:
+    HAS_NUMPY = False
+    print(f"Note: {__file__} requires numpy for matrix operations")
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Any
 import math
