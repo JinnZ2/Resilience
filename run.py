@@ -101,6 +101,16 @@ MODULES = {
         "cmd": [sys.executable, "-m", "sim.crisis_topology"],
         "desc": "8 crisis interfaces, leverage ranking, corridor deployment plan.",
     },
+    "17": {
+        "name": "Inversion Tools (zero-infra, salvage, dependency audit)",
+        "cmd": [sys.executable, "-m", "sim.inversion_tools"],
+        "desc": "10 zero-infra signals, 5 desalination systems, dependency audit.",
+    },
+    "18": {
+        "name": "Resource Flow Dynamics (hoarding vs circulation)",
+        "cmd": [sys.executable, "-m", "sim.resource_flow_dynamics"],
+        "desc": "When agents hoard, throughput collapses. Same math: water, knowledge, capital.",
+    },
 
     # --- GoatHerd ---
     "13": {
@@ -123,7 +133,7 @@ def main():
         ("Mesh Networking", ["3", "4"]),
         ("Search and Rescue", ["5", "6", "7"]),
         ("Knowledge + Reasoning", ["8", "9", "10", "11", "12"]),
-        ("Crisis Geology", ["14", "15", "16"]),
+        ("Crisis Geology", ["14", "15", "16", "17", "18"]),
         ("Field Tools", ["13"]),
     ]
 
