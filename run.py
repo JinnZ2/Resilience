@@ -111,6 +111,21 @@ MODULES = {
         "cmd": [sys.executable, "-m", "sim.resource_flow_dynamics"],
         "desc": "When agents hoard, throughput collapses. Same math: water, knowledge, capital.",
     },
+    "19": {
+        "name": "Geometric Exploration (erased alternatives)",
+        "cmd": [sys.executable, os.path.join("sim", "geometric_exploration.py")],
+        "desc": "Historical alternatives that were marginalized. Terra preta, three sisters.",
+    },
+    "20": {
+        "name": "Dissipative Systems (institutional thermodynamics)",
+        "cmd": [sys.executable, os.path.join("sim", "dissipative_systems.py")],
+        "desc": "Prigogine: blocked dissipation channels -> institutional collapse.",
+    },
+    "21": {
+        "name": "System Weaver (component weaving + audit)",
+        "cmd": [sys.executable, "-m", "sim.system_weaver"],
+        "desc": "Weave heterogeneous components. First principles parameter audit.",
+    },
 
     # --- GoatHerd ---
     "13": {
@@ -133,7 +148,7 @@ def main():
         ("Mesh Networking", ["3", "4"]),
         ("Search and Rescue", ["5", "6", "7"]),
         ("Knowledge + Reasoning", ["8", "9", "10", "11", "12"]),
-        ("Crisis Geology", ["14", "15", "16", "17", "18"]),
+        ("Crisis Geology", ["14", "15", "16", "17", "18", "19", "20", "21"]),
         ("Field Tools", ["13"]),
     ]
 
