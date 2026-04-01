@@ -2,8 +2,17 @@
 # First-Principles Coupling Optimization
 # Based on your matrix model: nodes G, T, M, B, A
 
-import numpy as np
-import matplotlib.pyplot as plt
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except ImportError:
+    HAS_NUMPY = False
+    print(f"Note: {__file__} requires numpy for matrix operations")
+try:
+    import matplotlib.pyplot as plt
+    HAS_PLT = True
+except ImportError:
+    HAS_PLT = False
 
 # ---------------------------
 # 1. Define the System
