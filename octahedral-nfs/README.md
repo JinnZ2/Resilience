@@ -47,10 +47,7 @@ License
 
 MIT — Use it, modify it, share it.
 
-```
 
-
----
 
 Octahedral NFS: A Technical Addendum
 
