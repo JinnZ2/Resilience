@@ -271,3 +271,16 @@ print()
 print("But the fact it runs on a phone at all")
 print("is already evidence the approach is light enough")
 print("for the infrastructure you're targeting.")
+
+
+
+### add
+
+# Updated Energy Signature for Stress Test
+N = 2004883  # 1009 * 1987
+D = 500      # 500 primes
+
+validator = PhoneValidator(N, D)
+# We only need D + 20 relations to see the pattern
+relations = validator.collect_relations(target=520) 
+results = validator.analyze_quick(relations)
