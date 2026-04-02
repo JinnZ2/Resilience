@@ -46,31 +46,35 @@ LWE has noisy coupling (high entropy, resistant).
 
 ### For Individuals and Small Organizations
 
-1. **Now**: Use RSA-4096 or Ed25519 (elliptic curve) for current needs
-2. **2025-2027**: Begin testing NIST post-quantum standards:
-   - **CRYSTALS-Kyber** (key encapsulation, lattice-based)
-   - **CRYSTALS-Dilithium** (digital signatures, lattice-based)
-   - **FALCON** (signatures, lattice-based, smaller)
-3. **2027-2030**: Migrate production systems to hybrid mode
+1. **Now (2026)**: Stop deploying new RSA systems. Use Ed25519 minimum.
+2. **Now (2026)**: Begin deploying NIST post-quantum standards:
+   - **ML-KEM / CRYSTALS-Kyber** (key encapsulation, FIPS 203 — finalized)
+   - **ML-DSA / CRYSTALS-Dilithium** (digital signatures, FIPS 204 — finalized)
+   - **FALCON / FN-DSA** (signatures, lattice-based, smaller)
+   These are not future standards. They are published NOW.
+3. **2026-2028**: Migrate production systems to hybrid mode
    (classical + post-quantum)
-4. **2030+**: Phase out RSA entirely
+4. **2028+**: Phase out RSA entirely
 
 ### For Infrastructure (Governments, Banks, Hospitals)
 
-1. **Now**: Inventory all RSA-dependent systems
-2. **2025-2026**: Deploy hybrid TLS (RSA + Kyber)
-3. **2026-2028**: Replace certificate infrastructure
-4. **2028-2030**: Full post-quantum migration
-5. **Ongoing**: Assume "harvest now, decrypt later" attacks are
-   already happening on stored encrypted traffic
+1. **Now (2026)**: Inventory all RSA-dependent systems
+2. **Now (2026)**: Deploy hybrid TLS (RSA + ML-KEM). Chrome and
+   Firefox already support it.
+3. **2026-2027**: Replace certificate infrastructure
+4. **2027-2028**: Full post-quantum migration
+5. **Assume**: "harvest now, decrypt later" attacks are ALREADY
+   happening on stored encrypted traffic. Everything sent over
+   RSA-only connections since ~2020 should be considered
+   potentially compromised within 5-10 years.
 
 ### For the Underfunded (the people this repo serves)
 
-1. **Now**: Use Signal (already adding post-quantum support)
-2. **Now**: Use WireGuard VPN (post-quantum options emerging)
-3. **If you run servers**: Update OpenSSL when PQ support ships
+1. **Now**: Use Signal (post-quantum PQXDH protocol already deployed)
+2. **Now**: Use WireGuard VPN (post-quantum options available)
+3. **If you run servers**: Update OpenSSL to 3.2+ (ML-KEM support shipped)
 4. **If you can't update**: Assume your encrypted traffic from
-   today will be readable in 5-10 years. Act accordingly.
+   today will be readable in 5 years. Not 10. 5. Act now.
 
 ## The Lattice Defense in Plain Terms
 
