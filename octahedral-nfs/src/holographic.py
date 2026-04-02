@@ -1,4 +1,3 @@
-```python
 """
 Holographic smoothness detection.
 
@@ -90,4 +89,3 @@ def is_smooth_holographic(n, factor_base, level_tables, level_products):
     if remaining == 1:
         return True, exponents
     return False, None
-```

@@ -1,4 +1,3 @@
-```python
 """
 Detect available hardware and choose best execution path.
 """
@@ -65,4 +64,3 @@ def choose_strategy(capabilities):
         return 'multicore'
     else:
         return 'single'
-```

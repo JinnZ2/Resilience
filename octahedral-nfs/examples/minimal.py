@@ -1,4 +1,3 @@
-```python
 """
 Minimal factorization example - runs on anything with Python.
 No numpy, no OpenCL required.
@@ -79,4 +78,3 @@ if __name__ == "__main__":
         print(f"{N} = {p} × {q}")
     else:
         print("Factorization failed - try larger bound?")
-```
