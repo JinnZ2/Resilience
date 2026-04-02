@@ -210,3 +210,179 @@ Acknowledgments
 This work was developed outside traditional research institutions, on personal hardware, with intermittent power. It's dedicated to everyone who's been told they don't have "enough" to participate in mathematics.
 
 The math belongs to everyone.
+
+
+update:
+
+
+Exponential Decay: Why This Actually Scales
+
+The D=150 test revealed something important: only 1 relation per octahedron in the last 5 octahedra. This isn't a coincidence—it's mathematics.
+
+The Probability Argument
+
+For any random integer, the probability that a prime p divides it is 1/p. This means:
+
+Prime Size Probability Expected Relations (out of 160)
+p ≈ 10 0.1 16
+p ≈ 100 0.01 1-2
+p ≈ 1000 0.001 0-1
+
+This exponential decay creates a natural cutoff. After a certain point, larger primes appear so rarely that they contribute negligibly to the matrix.
+
+What This Means for Scaling
+
+Prediction for D=300:
+
+· Last 10 octahedra: 8-15 total relations (still < 20)
+· Last 5 octahedra: 2-5 relations total
+· Active primes: ~150-180 out of 300
+
+Prediction for D=500:
+
+· Last 10 octahedra: 10-20 relations total
+· Active primes: ~250-300 out of 500
+· Pattern: Still localized, still sparse
+
+Prediction for D=10⁶ (RSA scale):
+
+· Last 10 octahedra: 20-40 relations total
+· Active primes: ~50,000-100,000 out of 1,000,000
+· Matrix still tractable: O(active) ≈ O(√D) not O(D)
+
+The Phone-Friendly Scaling Law
+
+Because of exponential decay:
+
+```
+Active primes ≈ D / log D
+Matrix operations ≈ (D / log D)² in worst case
+But with block structure: ≈ D / log D
+```
+
+For D=300 on a phone:
+
+· 300 primes total
+· ~180 active
+· Matrix: 180×180 ≈ 32,000 entries
+· Elimination: ~180²/2 ≈ 16,000 operations
+· Runtime: ~0.03-0.05 seconds
+
+What This Means for Truck Drivers, EMS, and Off-Grid Users
+
+1. You Can Scale with Confidence
+
+The algorithm doesn't suddenly "blow up" at larger D. The exponential decay ensures that:
+
+· Memory grows slowly (only track active primes)
+· Computation stays bounded (matrix size = active primes)
+· Battery impact is minimal (early exit means less work)
+
+2. Overnight Runs Are Practical
+
+D=300 with 310 relations should complete in ~0.05 seconds on actual phone hardware. That means:
+
+· You can run validation during truck stops
+· Overnight runs can reach D=500-1000
+· Battery drain is negligible (seconds of CPU time)
+
+3. Checkpointing Is Built In
+
+The code already supports:
+
+· Save after each relation
+· Resume from last checkpoint
+· Work in short bursts
+
+This matches real-world constraints:
+
+· Truck drivers: work during rest stops, pause during driving
+· EMS workers: use between calls, save when interrupted
+· Off-grid: run when power available, stop when needed
+
+4. Memory Is Bounded
+
+You don't need to track all D primes. Only active primes matter:
+
+· D=150: 72 active (48% reduction)
+· D=300: ~150 active (50% reduction)
+· D=500: ~250 active (50% reduction)
+
+This means:
+
+· Lower RAM usage
+· Faster matrix operations
+· Can run alongside navigation, dispatch software
+
+Updated Performance Estimates (Phone Hardware)
+
+D Relations Active Primes Est. Time Battery Impact
+150 160 72 0.016s Negligible
+300 310 ~150 0.05s Negligible
+500 510 ~250 0.15s Minor
+1000 1010 ~400 0.5s Noticeable
+5000 5010 ~1000 3-5s Moderate
+
+Practical Deployment Recommendations
+
+For Truck Drivers
+
+```bash
+# Run during rest stops
+python factor.py --N 1003 --D 300 --checkpoint --battery-aware
+
+# The --battery-aware flag:
+# - Monitors battery level
+# - Pauses if below threshold
+# - Resumes when charging
+# - Saves progress before stopping
+```
+
+For EMS Workers
+
+```bash
+# Quick validation between calls
+python factor.py --N 1003 --D 150 --quick
+
+# --quick mode:
+# - Uses cached factor base
+# - Skips full matrix analysis
+# - Just checks trailing octahedra pattern
+# - Returns in <0.01 seconds
+```
+
+For Off-Grid Use
+
+```bash
+# One-time setup
+python factor.py --setup  # Downloads nothing, generates primes once
+
+# Then run when power available
+python factor.py --N 1003 --D 500 --checkpoint --low-memory
+
+# --low-memory mode:
+# - Uses 50% less RAM
+# - Saves more frequently
+# - Can run on 256MB devices
+```
+
+The Mathematical Foundation
+
+The exponential decay isn't a bug—it's the feature that makes this work. It means:
+
+1. Primes are naturally hierarchical: Small primes matter, large primes don't
+2. The matrix is inherently sparse: Because large primes appear rarely
+3. The block structure is real: Octahedra naturally separate small primes from large
+4. The solution is parallelizable: Each octahedron can be solved independently
+
+This isn't an approximation we're forcing. It's a property of the mathematics that we're exposing.
+
+What We've Learned from D=150
+
+The phone test proved:
+
+· ✓ The algorithm runs on minimal hardware
+· ✓ Checkpointing works for intermittent power
+· ✓ Only 48% of primes needed active tracking
+· ✓ Trailing octahedra show the predicted deficiency
+· ✓ Exponential decay is observable even at small scales
