@@ -1,4 +1,3 @@
-```python
 """
 Parallel GF(2) nullspace solver using octahedral decomposition.
 """
@@ -29,4 +28,3 @@ def solve_nullspace_blocks(blocks, n_cols):
                 nullspace.append([])  # Placeholder
                 
     return nullspace
-```

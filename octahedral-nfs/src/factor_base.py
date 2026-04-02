@@ -1,4 +1,3 @@
-```python
 """
 Prime generation and octahedral mapping.
 
@@ -51,4 +50,3 @@ def octahedral_mapping(primes):
             octa_to_primes[octa_idx][vertex_idx] = p
             
     return prime_to_octa, prime_to_vertex, octa_to_primes
-```

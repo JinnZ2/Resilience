@@ -1,4 +1,3 @@
-```python
 """
 Octahedral block decomposition of the exponent matrix.
 
@@ -100,4 +99,3 @@ def block_rank(block_matrix):
         rank += 1
         
     return rank
-```
