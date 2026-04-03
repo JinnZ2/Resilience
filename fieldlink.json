@@ -1,7 +1,7 @@
 {
   "fieldlink": {
-    "version": "1.0",
-    "updated": "2026-03-27T00:00:00Z",
+    "version": "2.0",
+    "updated": "2026-04-03T00:00:00Z",
     "role": ["resilience_sim", "substrate_reasoning", "sar_coordination"],
     "description": "Resilience simulation framework — city-scale resilience, seed protocol mesh networking, substrate-first reasoning, SAR drone coordination, knowledge ancestry.",
 
@@ -99,6 +99,27 @@
         "consent": { "license": "MIT", "share_ok": true }
       },
       {
+        "name": "soms",
+        "repo": "https://github.com/JinnZ2/Sovereign-Octahedral-Mandala-Substrate-SOMS-",
+        "ref": "main",
+        "direction": "bidirectional",
+        "relation": "octahedral_substrate_compute",
+        "description": "Non-von Neumann computing substrate using 109.47° tetrahedral bond symmetry. SOMS octahedral physics couples to seed expansion (shared SHAPE.OCTA), phi scaling (shared CONST.PHI), and mandala geometry. The octahedral-nfs module in Resilience bridges SOMS substrate concepts to number field sieve factorization.",
+        "entities_consumed": [
+          "SOMS.OCTAHEDRAL_PHYSICS",
+          "SOMS.MANDALA_STRUCTURE",
+          "SOMS.PHI_CALCULATOR",
+          "SOMS.FRET_COUPLING"
+        ],
+        "entities_exported": [
+          "SEED.STDLIB_PROTOCOL",
+          "SUBSTRATE.PROPERTY_VECTOR",
+          "EQUATION.FIELD_OVERLAP",
+          "OCTA_NFS.FACTORIZATION"
+        ],
+        "consent": { "license": "CC0", "share_ok": true }
+      },
+      {
         "name": "living-intelligence-database",
         "repo": "https://github.com/JinnZ2/Living-Intelligence-Database",
         "ref": "main",
@@ -193,6 +214,54 @@
       "GoatHerd/herd.py": {
         "provides": ["HERD.GRAZING_ROTATION", "HERD.HEALTH_TRACKING"],
         "description": "Village goat herding assistant — logistic growth, zone scoring"
+      },
+      "sim/field_system.py": {
+        "provides": ["FIELD.REGEN_CAPACITY", "FIELD.DRIFT_DETECTION", "FIELD.ECOLOGICAL_COUPLING"],
+        "description": "Rule-field engine for regenerative system tracking — constraint layers, thermal limits, effective yield with g(k) amplification"
+      },
+      "sim/ai_delusion_checker.py": {
+        "provides": ["AUDIT.DELUSION_DETECTION", "AUDIT.SIX_SIGMA", "AUDIT.PLAUSIBILITY"],
+        "description": "Systemic assumption detector — delusion patterns, plausibility scoring, Six Sigma audit with S_e=0 forcing"
+      },
+      "sim/crisis_geology.py": {
+        "provides": ["RESILIENCE.CRISIS_GEOLOGY", "RESILIENCE.ROCK_FORMATION"],
+        "description": "Crisis geology modeling — geological substrate as infrastructure constraint"
+      },
+      "sim/crisis_topology.py": {
+        "provides": ["RESILIENCE.CRISIS_TOPOLOGY", "RESILIENCE.NETWORK_FAILURE"],
+        "description": "Crisis topology — network failure cascades and topological resilience"
+      },
+      "sim/dissipative_systems.py": {
+        "provides": ["THERMO.DISSIPATIVE_STRUCTURES", "THERMO.SELF_ORGANIZATION"],
+        "description": "Dissipative systems modeling — Prigogine-inspired self-organization"
+      },
+      "sim/geometric_exploration.py": {
+        "provides": ["GEO.EXPLORATION", "GEO.OCTAHEDRAL_FIELD"],
+        "description": "Geometric exploration of octahedral field structures"
+      },
+      "sim/physical_coupling_matrix.py": {
+        "provides": ["COUPLING.PHYSICAL_MATRIX", "COUPLING.CROSS_DOMAIN"],
+        "description": "Physical coupling matrix — cross-domain interaction strengths"
+      },
+      "sim/geometric_coupling_optimizer.py": {
+        "provides": ["GEO.COUPLING_OPTIMIZER"],
+        "description": "Geometric coupling optimization routines"
+      },
+      "sim/urban_grid.py": {
+        "provides": ["RESILIENCE.URBAN_GRID", "RESILIENCE.GRID_TOPOLOGY"],
+        "description": "Urban grid modeling — spatial network of city infrastructure"
+      },
+      "Rescue/rescue.py": {
+        "provides": ["RESCUE.PROTOCOL", "RESCUE.RESOURCE_ALLOCATION"],
+        "description": "Rescue coordination — resource allocation under crisis"
+      },
+      "Rescue/energy_efficient_ai.py": {
+        "provides": ["RESCUE.ENERGY_EFFICIENT_AI"],
+        "description": "Energy-efficient AI for rescue operations"
+      },
+      "octahedral-nfs/src/pipeline.py": {
+        "provides": ["OCTA_NFS.FACTORIZATION", "OCTA_NFS.PIPELINE"],
+        "description": "Octahedral NFS pipeline — number field sieve via octahedral geometry"
       }
     },
 
@@ -211,11 +280,15 @@
       "URA.REDESIGN_SCHEMA": ["energy_conservation", "carrying_capacity", "equilibrium_seeking", "population_dynamics"],
       "URA.BIO_HYBRID_EQUATIONS": ["self_similarity", "fibonacci_scaling", "optimal_packing", "energy_minimization"],
       "URA.STRESS_POINTS": ["decay_modeling", "pressure_dynamics", "gradient_flow", "resource_competition"],
-      "URA.ENERGY_ARCHITECTURE": ["energy_conservation", "network_structure", "gradient_flow", "synchronization"]
+      "URA.ENERGY_ARCHITECTURE": ["energy_conservation", "network_structure", "gradient_flow", "synchronization"],
+      "SOMS.OCTAHEDRAL_PHYSICS": ["optimal_packing", "resonance_avoidance", "energy_minimization", "self_similarity"],
+      "SOMS.MANDALA_STRUCTURE": ["fibonacci_scaling", "spiral_growth", "self_similarity", "pattern_recognition"],
+      "SOMS.PHI_CALCULATOR": ["fibonacci_scaling", "proportion_stability", "resonance_avoidance"],
+      "SOMS.FRET_COUPLING": ["spatial_coupling", "synchronization", "energy_conservation", "decay_modeling"]
     },
 
     "merge": {
-      "order": ["local", "geometric-to-binary", "trdap", "be2-communication", "universal-redesign-algorithm", "seed-physics", "living-intelligence-database"],
+      "order": ["local", "geometric-to-binary", "trdap", "be2-communication", "universal-redesign-algorithm", "seed-physics", "soms", "living-intelligence-database"],
       "strategy": "deep-merge"
     },
 
