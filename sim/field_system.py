@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/field_system.py
+# PROVIDES: FIELD.REGEN_CAPACITY, FIELD.DRIFT_DETECTION, FIELD.ECOLOGICAL_COUPLING
+# DEPENDS: stdlib-only
+# RUN: python -m sim.field_system
+# TIER: domain
+# Rule-field engine — regen capacity, drift detection, ecological coupling g(k)
 """
 Field System — Minimal Portable Rule-Field Engine for Regenerative System Tracking
 

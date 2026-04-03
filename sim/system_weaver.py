@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/system_weaver.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: python -m sim.system_weaver
+# TIER: domain
+# System weaving and first principles audit framework
 """
 sim/system_weaver.py — System Weaving + First Principles Audit
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

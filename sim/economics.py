@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/economics.py
+# PROVIDES: build_madison_economics
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Thermodynamic economics — substrate flow direction replaces GDP
 """
 sim/economics.py — thermodynamic economics layer
 Urban Resilience Simulator

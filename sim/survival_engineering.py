@@ -1,3 +1,9 @@
+# MODULE: sim/survival_engineering.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Shuttle/submarine criticality tiers (T1-T4) applied to institutions
 # “””
 survival_engineering.py
 

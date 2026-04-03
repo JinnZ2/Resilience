@@ -1,3 +1,9 @@
+# MODULE: sim/datacenter_net_zero.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Data center as thermodynamic institution with coupling channels
 # “””
 datacenter_net_zero.py
 

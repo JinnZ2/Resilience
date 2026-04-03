@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/fidelity_accounting.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Knowledge fidelity as corporate accounting for decision quality
 """
 sim/fidelity_accounting.py — Knowledge Fidelity as Corporate Accounting
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

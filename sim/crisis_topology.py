@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/crisis_topology.py
+# PROVIDES: RESILIENCE.CRISIS_TOPOLOGY
+# DEPENDS: stdlib-only
+# RUN: python -m sim.crisis_topology
+# TIER: domain
+# Problem topology mapping interface failures between coupled systems
 """
 sim/crisis_topology.py — Problem Topology: Where Leverage Actually Lives
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

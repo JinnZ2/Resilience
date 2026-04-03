@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/innovation_engine_recycling_full.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Full recycling innovation engine with complete pipeline
 # innovation_engine_recycling_full.py
 # Full Innovation Suite with Dynamic Energy Recycling
 # Multiple innovations, cumulative effects, and optimization

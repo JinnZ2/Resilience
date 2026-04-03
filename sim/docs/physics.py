@@ -1,3 +1,9 @@
+# MODULE: sim/docs/physics.py
+# PROVIDES: —
+# DEPENDS: sim.energy_games
+# RUN: —
+# TIER: core
+# Substrate maintenance ledger and sensor suite definitions
 @dataclass
 class SubstrateMaintenanceLedger:
     """

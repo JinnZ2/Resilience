@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: SAR/SeaFrost/maersk_fire_test.py
+# PROVIDES: —
+# DEPENDS: SAR.SeaFrost.digital_twin (optional), SAR.workflow_bridge (optional)
+# RUN: python SAR/SeaFrost/maersk_fire_test.py
+# TIER: demo
+# Maersk C204 fire scenario test with SeaFrost wolf pack deployment
 """
 Maersk Charlie-204 Lithium Fire Test: SeaFrost wolf pack deployment
 90 seconds from alarm to -20C suppression

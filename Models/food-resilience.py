@@ -1,3 +1,9 @@
+# MODULE: Models/food-resilience.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: demo
+# Michaelis-Menten yield + ENSO forcing with reserve buffers
 """
 Food System Resilience Model
 Nonlinear yield with reserves buffer, asymmetric adaptation, parametric instability.

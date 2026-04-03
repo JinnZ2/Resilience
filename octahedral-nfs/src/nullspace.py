@@ -1,3 +1,9 @@
+# MODULE: octahedral-nfs/src/nullspace.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Parallel GF(2) nullspace solver using octahedral decomposition
 """
 Parallel GF(2) nullspace solver using octahedral decomposition.
 """

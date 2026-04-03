@@ -1,3 +1,9 @@
+# MODULE: octahedral-nfs/phone_optimized_scaling.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Phone-optimized validation with pause/resume and checkpoints
 """
 Phone-Optimized Validation
 Runs on limited memory, can be paused/resumed, shows progress

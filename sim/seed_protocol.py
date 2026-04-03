@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/seed_protocol.py
+# PROVIDES: SEED.STDLIB_PROTOCOL, SEED.MESH_SIMULATION
+# DEPENDS: stdlib-only
+# RUN: python -m sim.seed_protocol
+# TIER: core
+# Stdlib-only octahedral seed expansion, 21-byte packets, mesh networking
 """
 sim/seed_protocol.py — Stdlib-Only Seed Protocol
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

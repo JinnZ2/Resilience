@@ -1,3 +1,9 @@
+# MODULE: sim/innovation_engine_recycling.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Recycling-focused innovation engine
 # innovation_engine_recycling.py
 # Systematic Innovation with Dynamic Energy Recycling
 # First-principles exploration of new couplings, captures, and loops

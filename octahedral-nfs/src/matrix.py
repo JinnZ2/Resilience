@@ -1,3 +1,9 @@
+# MODULE: octahedral-nfs/src/matrix.py
+# PROVIDES: —
+# DEPENDS: numpy (optional)
+# RUN: —
+# TIER: tool
+# Octahedral block decomposition of exponent matrix
 """
 Octahedral block decomposition of the exponent matrix.
 

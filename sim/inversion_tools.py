@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/inversion_tools.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Inversion analysis tools for system state assessment
 """
 sim/inversion_tools.py — Integrated Tools from Inversion Repository
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

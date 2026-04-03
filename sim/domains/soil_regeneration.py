@@ -1,3 +1,9 @@
+# MODULE: sim/domains/soil_regeneration.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: python -m sim.domains.soil_regeneration
+# TIER: domain
+# Soil domain — knowledge holder age as first-class variable
 
 #!/usr/bin/env python3
 """

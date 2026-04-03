@@ -1,3 +1,9 @@
+# MODULE: irony.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: python irony.py
+# TIER: demo
+# Philosophical essay — 'too complex' vs natural system precedents
 # the_irony.py
 # People and AI call it "too complex" while living in a coupled system
 

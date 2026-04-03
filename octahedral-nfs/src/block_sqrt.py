@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: octahedral-nfs/src/block_sqrt.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Block-diagonal square root exploiting octahedral locality
 """
 octahedral-nfs/src/block_sqrt.py — Block-Diagonal Square Root
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

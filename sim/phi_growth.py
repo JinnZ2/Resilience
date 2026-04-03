@@ -1,3 +1,9 @@
+# MODULE: sim/phi_growth.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Golden ratio growth scaling for sustainable systems
 @dataclass
 class PhiGrowthLayer:
     """

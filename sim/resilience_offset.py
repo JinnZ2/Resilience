@@ -1,3 +1,9 @@
+# MODULE: sim/resilience_offset.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Thermodynamic bail system for institutions failing tests
 # ”””
 # resilience_offset.py
 #

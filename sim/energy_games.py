@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/energy_games.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Energy system game theory with bidirectional flows
 """
 sim/energy_games.py — energy distribution through game theory
 Urban Resilience Simulator

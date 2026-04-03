@@ -1,3 +1,9 @@
+# MODULE: octahedral-nfs/hardware/detect.py
+# PROVIDES: —
+# DEPENDS: pyopencl (optional)
+# RUN: —
+# TIER: tool
+# Hardware capability detection (OpenCL, RAM, thermal limits)
 """
 Detect available hardware and choose best execution path.
 """

@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: KnowledgeDNA/substrate.py
+# PROVIDES: SUBSTRATE.PROPERTY_VECTOR, SUBSTRATE.REASONING
+# DEPENDS: stdlib-only
+# RUN: python -m KnowledgeDNA.substrate
+# TIER: bridge
+# Substrate-first reasoning — decompose to physics, propagate across domains
 """
 KnowledgeDNA/substrate.py — Substrate-First Reasoning Module
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

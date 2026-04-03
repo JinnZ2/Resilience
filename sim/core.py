@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/core.py
+# PROVIDES: StressScenario, StressType, Season, CityNode, ResilienceFoundation, InfrastructureLayers, RedundancyLevel
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: core
+# Dataclasses and enums — StressScenario, Season, CityNode, etc.
 """
 sim/core.py — all dataclasses and enums
 Urban Resilience Simulator

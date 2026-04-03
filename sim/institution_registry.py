@@ -1,3 +1,9 @@
+# MODULE: sim/institution_registry.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Unified scoring system across all institution types
 # “””
 institution_registry.py
 

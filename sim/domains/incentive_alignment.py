@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/domains/incentive_alignment.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: python -m sim.domains.incentive_alignment
+# TIER: domain
+# Incentive structure alignment for regeneration vs extraction
 """
 sim/domains/incentive_alignment.py
 Urban Resilience Simulator — Incentive Layer

@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/dissipative_systems.py
+# PROVIDES: THERMO.DISSIPATIVE_STRUCTURES
+# DEPENDS: stdlib-only
+# RUN: python -m sim.dissipative_systems
+# TIER: domain
+# Prigogine-inspired dissipative structure modeling for institutions
 """
 Dissipative Systems Simulation — Institutional Thermodynamics of Inversion
 

@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/domains/triage_layer.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: python -m sim.domains.triage_layer
+# TIER: domain
+# Infrastructure triage — financial vs thermodynamic priorities
 """
 sim/domains/triage_layer.py
 Urban Resilience Simulator — Infrastructure Triage

@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: octahedral-nfs/src/pipeline.py
+# PROVIDES: OCTA_NFS.FACTORIZATION, OCTA_NFS.PIPELINE
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Complete octahedral NFS factorization pipeline
 """
 octahedral-nfs/src/pipeline.py — Complete Octahedral NFS Pipeline
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

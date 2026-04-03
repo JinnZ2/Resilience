@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/engine.py
+# PROVIDES: run_city_assessment, print_report
+# DEPENDS: sim.core
+# RUN: —
+# TIER: core
+# Simulation engine — run_city_assessment(), print_report()
 """
 sim/engine.py — stress engine and cascade logic
 Urban Resilience Simulator

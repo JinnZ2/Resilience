@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/energy_taxonomy.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: python -m sim.energy_taxonomy
+# TIER: domain
+# First-principles energy capture taxonomy and interaction model
 """
 sim/energy_taxonomy.py — First-Principles Energy Taxonomy
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

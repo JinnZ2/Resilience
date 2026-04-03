@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/seed_mesh.py
+# PROVIDES: MESH.GRID_FAILURE_SIM, MESH.CASCADE_MITIGATION
+# DEPENDS: sim.cities.coupling (optional)
+# RUN: python -m sim.seed_mesh
+# TIER: bridge
+# City resilience mesh bridge — grid failure simulation
 """
 sim/seed_mesh.py — Seed Mesh Bridge to City Resilience Model
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim
