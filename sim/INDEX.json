@@ -48,8 +48,8 @@
       "tier": "core"
     },
     "sim/seed_mesh.py": {
-      "one_line": "City resilience mesh bridge — grid failure simulation",
-      "provides": ["MESH.GRID_FAILURE_SIM", "MESH.CASCADE_MITIGATION"],
+      "one_line": "City resilience mesh bridge — grid failure sim, gossip sync, Merkle diff",
+      "provides": ["MESH.GRID_FAILURE_SIM", "MESH.CASCADE_MITIGATION", "MESH.GOSSIP_SYNC", "MESH.MERKLE_DIFF"],
       "depends": ["sim.cities.coupling (optional)"],
       "runnable": true,
       "run_cmd": "python -m sim.seed_mesh",
