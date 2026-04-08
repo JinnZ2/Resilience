@@ -1,0 +1,518 @@
+{
+  "_comment": "Machine-readable module index. Read this first to understand the codebase.",
+  "_version": "1.0",
+  "_updated": "2026-04-03",
+  "tiers": {
+    "core": "Entry point and shared data structures — always relevant",
+    "domain": "Standalone domain models — topic-specific, run independently",
+    "bridge": "Cross-repo or cross-package connectors",
+    "tool": "Utilities and analyzers",
+    "demo": "Example scenarios and city models"
+  },
+  "modules": {
+    "sim/run.py": {
+      "one_line": "Entry point — runs Madison WI stress assessment",
+      "provides": [],
+      "depends": ["sim.core", "sim.engine", "sim.cities.madison_wi"],
+      "runnable": true,
+      "run_cmd": "python -m sim.run",
+      "tier": "core"
+    },
+    "sim/core.py": {
+      "one_line": "Dataclasses and enums — StressScenario, Season, CityNode, etc.",
+      "provides": ["StressScenario", "StressType", "Season", "CityNode", "ResilienceFoundation", "InfrastructureLayers", "RedundancyLevel"],
+      "depends": [],
+      "runnable": false,
+      "tier": "core"
+    },
+    "sim/engine.py": {
+      "one_line": "Simulation engine — run_city_assessment(), print_report()",
+      "provides": ["run_city_assessment", "print_report"],
+      "depends": ["sim.core"],
+      "runnable": false,
+      "tier": "core"
+    },
+    "sim/schema_v2.py": {
+      "one_line": "Tightened schema with cognitive readiness and decision authority",
+      "provides": ["build_madison_v2"],
+      "depends": [],
+      "runnable": false,
+      "tier": "core"
+    },
+    "sim/seed_protocol.py": {
+      "one_line": "Stdlib-only octahedral seed expansion, 21-byte packets, mesh networking",
+      "provides": ["SEED.STDLIB_PROTOCOL", "SEED.MESH_SIMULATION"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.seed_protocol",
+      "tier": "core"
+    },
+    "sim/seed_mesh.py": {
+      "one_line": "City resilience mesh bridge — grid failure sim, gossip sync, Merkle diff",
+      "provides": ["MESH.GRID_FAILURE_SIM", "MESH.CASCADE_MITIGATION", "MESH.GOSSIP_SYNC", "MESH.MERKLE_DIFF"],
+      "depends": ["sim.cities.coupling (optional)"],
+      "runnable": true,
+      "run_cmd": "python -m sim.seed_mesh",
+      "tier": "bridge"
+    },
+    "sim/field_system.py": {
+      "one_line": "Rule-field engine — regen capacity, drift detection, ecological coupling g(k)",
+      "provides": ["FIELD.REGEN_CAPACITY", "FIELD.DRIFT_DETECTION", "FIELD.ECOLOGICAL_COUPLING"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.field_system",
+      "tier": "domain"
+    },
+    "sim/ai_delusion_checker.py": {
+      "one_line": "Systemic assumption detector — delusion patterns, Six Sigma audit, S_e=0",
+      "provides": ["AUDIT.DELUSION_DETECTION", "AUDIT.SIX_SIGMA", "AUDIT.PLAUSIBILITY"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.ai_delusion_checker",
+      "tier": "tool"
+    },
+    "sim/economics.py": {
+      "one_line": "Thermodynamic economics — substrate flow direction replaces GDP",
+      "provides": ["build_madison_economics"],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/energy_games.py": {
+      "one_line": "Energy system game theory with bidirectional flows",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/city_thermodynamics.py": {
+      "one_line": "Institutions as thermodynamic engines with energy accounting",
+      "provides": ["build_city_1000"],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/city_optimization.py": {
+      "one_line": "Cross-domain upgrade evaluation and leakage auditing",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/thermodynamic_impact.py": {
+      "one_line": "Replaces IMPLAN with thermodynamic reality accounting",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "sim/survival_engineering.py": {
+      "one_line": "Shuttle/submarine criticality tiers (T1-T4) applied to institutions",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/purpose_deviation.py": {
+      "one_line": "Institutional drift measurement from ungameable physical signals",
+      "provides": [],
+      "depends": ["sim.city_thermodynamics (optional)", "sim.city_optimization (optional)"],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/phi_growth.py": {
+      "one_line": "Golden ratio growth scaling for sustainable systems",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/institution_registry.py": {
+      "one_line": "Unified scoring system across all institution types",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/institutional_first_principles.py": {
+      "one_line": "Institution thermodynamic deconstruction and operator trust decay",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/datacenter_net_zero.py": {
+      "one_line": "Data center as thermodynamic institution with coupling channels",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/resilience_offset.py": {
+      "one_line": "Thermodynamic bail system for institutions failing tests",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/crisis_geology.py": {
+      "one_line": "Geothermal transducer sensor network for crisis early warning",
+      "provides": ["RESILIENCE.CRISIS_GEOLOGY"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.crisis_geology",
+      "tier": "domain"
+    },
+    "sim/crisis_topology.py": {
+      "one_line": "Problem topology mapping interface failures between coupled systems",
+      "provides": ["RESILIENCE.CRISIS_TOPOLOGY"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.crisis_topology",
+      "tier": "domain"
+    },
+    "sim/dissipative_systems.py": {
+      "one_line": "Prigogine-inspired dissipative structure modeling for institutions",
+      "provides": ["THERMO.DISSIPATIVE_STRUCTURES"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.dissipative_systems",
+      "tier": "domain"
+    },
+    "sim/energy_taxonomy.py": {
+      "one_line": "First-principles energy capture taxonomy and interaction model",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.energy_taxonomy",
+      "tier": "domain"
+    },
+    "sim/fidelity_accounting.py": {
+      "one_line": "Knowledge fidelity as corporate accounting for decision quality",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/geometric_coupling_optimizer.py": {
+      "one_line": "Coupling optimization based on matrix model nodes",
+      "provides": ["GEO.COUPLING_OPTIMIZER"],
+      "depends": ["numpy (optional)", "matplotlib (optional)"],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "sim/geometric_exploration.py": {
+      "one_line": "Octahedral field structure exploration — historical alternatives generator",
+      "provides": ["GEO.EXPLORATION"],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/innovation_engine.py": {
+      "one_line": "Systematic innovation for power increase through new couplings",
+      "provides": [],
+      "depends": ["numpy (optional)"],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "sim/innovation_engine_recycling.py": {
+      "one_line": "Recycling-focused innovation engine",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "sim/innovation_engine_recycling_full.py": {
+      "one_line": "Full recycling innovation engine with complete pipeline",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "sim/inversion_tools.py": {
+      "one_line": "Inversion analysis tools for system state assessment",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "sim/physical_coupling_matrix.py": {
+      "one_line": "Cross-domain interaction strengths as coupling matrix",
+      "provides": ["COUPLING.PHYSICAL_MATRIX"],
+      "depends": [],
+      "runnable": false,
+      "tier": "domain"
+    },
+    "sim/resource_flow_dynamics.py": {
+      "one_line": "Coupled resource flow dynamics — hoarding vs circulation",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.resource_flow_dynamics",
+      "tier": "domain"
+    },
+    "sim/system_weaver.py": {
+      "one_line": "System weaving and first principles audit framework",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.system_weaver",
+      "tier": "domain"
+    },
+    "sim/urban_grid.py": {
+      "one_line": "Urban magnomechanical grid retrofit with transducer networks",
+      "provides": ["RESILIENCE.URBAN_GRID"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.urban_grid",
+      "tier": "domain"
+    },
+    "sim/cities/madison_wi.py": {
+      "one_line": "Madison WI city model — build_madison() with real infrastructure data",
+      "provides": ["build_madison"],
+      "depends": ["sim.core"],
+      "runnable": false,
+      "tier": "demo"
+    },
+    "sim/cities/coupling.py": {
+      "one_line": "Cross-domain coupling and cascade amplification dynamics",
+      "provides": ["RESILIENCE.COUPLING_EDGE", "RESILIENCE.KNOWLEDGE_DECAY"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.cities.coupling",
+      "tier": "domain"
+    },
+    "sim/domains/soil_regeneration.py": {
+      "one_line": "Soil domain — knowledge holder age as first-class variable",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.domains.soil_regeneration",
+      "tier": "domain"
+    },
+    "sim/domains/incentive_alignment.py": {
+      "one_line": "Incentive structure alignment for regeneration vs extraction",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.domains.incentive_alignment",
+      "tier": "domain"
+    },
+    "sim/domains/triage_layer.py": {
+      "one_line": "Infrastructure triage — financial vs thermodynamic priorities",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m sim.domains.triage_layer",
+      "tier": "domain"
+    },
+    "sim/docs/physics.py": {
+      "one_line": "Substrate maintenance ledger and sensor suite definitions",
+      "provides": [],
+      "depends": ["sim.energy_games"],
+      "runnable": false,
+      "tier": "core"
+    },
+    "KnowledgeDNA/knowledge_dna.py": {
+      "one_line": "Knowledge ancestry and field propagation using directed graphs",
+      "provides": ["DNA.KNOWLEDGE_FIELD", "DNA.FRAGILITY_ANALYSIS"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m KnowledgeDNA.knowledge_dna",
+      "tier": "bridge"
+    },
+    "KnowledgeDNA/equation_field.py": {
+      "one_line": "14 equations x 15 domains — overlap scoring and bridge discovery",
+      "provides": ["EQUATION.FIELD_OVERLAP", "EQUATION.MULTI_PURPOSE_REUSE"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m KnowledgeDNA.equation_field",
+      "tier": "bridge"
+    },
+    "KnowledgeDNA/substrate.py": {
+      "one_line": "Substrate-first reasoning — decompose to physics, propagate across domains",
+      "provides": ["SUBSTRATE.PROPERTY_VECTOR", "SUBSTRATE.REASONING"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m KnowledgeDNA.substrate",
+      "tier": "bridge"
+    },
+    "KnowledgeDNA/geobin_bridge.py": {
+      "one_line": "GEIS vertex bits <-> substrate properties bidirectional bridge",
+      "provides": ["BRIDGE.GEIS_TO_SUBSTRATE"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m KnowledgeDNA.geobin_bridge",
+      "tier": "bridge"
+    },
+    "KnowledgeDNA/living_intelligence.py": {
+      "one_line": "Living Intelligence Database connector — 38 teachers as equations",
+      "provides": ["DNA.TEACHER_GRAPH", "SUBSTRATE.LIVING_EQUATIONS"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m KnowledgeDNA.living_intelligence",
+      "tier": "bridge"
+    },
+    "GoatHerd/herd.py": {
+      "one_line": "Village goat herding assistant — logistic growth, zone scoring",
+      "provides": ["HERD.GRAZING_ROTATION", "HERD.HEALTH_TRACKING"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m GoatHerd.herd",
+      "tier": "demo"
+    },
+    "Rescue/rescue.py": {
+      "one_line": "Drone rescue operations in GPS-denied environments",
+      "provides": ["RESCUE.PROTOCOL", "RESCUE.RESOURCE_ALLOCATION"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m Rescue.rescue",
+      "tier": "bridge"
+    },
+    "Rescue/energy_efficient_ai.py": {
+      "one_line": "Energy-efficient AI for resource-constrained rescue operations",
+      "provides": ["RESCUE.ENERGY_EFFICIENT_AI"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m Rescue.energy_efficient_ai",
+      "tier": "tool"
+    },
+    "SAR/workflow_bridge.py": {
+      "one_line": "Stdlib-only geometric swarm engine with fault tolerance",
+      "provides": ["SAR.GEOMETRIC_PIPELINE", "SAR.WAYPOINT_EXPORT"],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python -m SAR.workflow_bridge",
+      "tier": "bridge"
+    },
+    "SAR/mobius_swarm.py": {
+      "one_line": "Mobius equilibrium swarm with phi invariants for drone resilience",
+      "provides": [],
+      "depends": ["numpy"],
+      "runnable": false,
+      "tier": "bridge"
+    },
+    "SAR/swarm_bridge.py": {
+      "one_line": "Drone swarm bridge — MAVLink/ArduPilot integration",
+      "provides": [],
+      "depends": ["pymavlink (optional)"],
+      "runnable": false,
+      "tier": "bridge"
+    },
+    "SAR/SeaFrost/digital_twin.py": {
+      "one_line": "Ship digital twin engine for fire response path pre-calculation",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "demo"
+    },
+    "SAR/SeaFrost/maersk_fire_test.py": {
+      "one_line": "Maersk C204 fire scenario test with SeaFrost wolf pack deployment",
+      "provides": [],
+      "depends": ["SAR.SeaFrost.digital_twin (optional)", "SAR.workflow_bridge (optional)"],
+      "runnable": true,
+      "run_cmd": "python SAR/SeaFrost/maersk_fire_test.py",
+      "tier": "demo"
+    },
+    "octahedral-nfs/src/pipeline.py": {
+      "one_line": "Complete octahedral NFS factorization pipeline",
+      "provides": ["OCTA_NFS.FACTORIZATION", "OCTA_NFS.PIPELINE"],
+      "depends": [],
+      "runnable": true,
+      "tier": "tool"
+    },
+    "octahedral-nfs/src/holographic.py": {
+      "one_line": "Holographic smoothness detection for NFS",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "octahedral-nfs/src/factor_base.py": {
+      "one_line": "Prime generation and octahedral mapping",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "octahedral-nfs/src/matrix.py": {
+      "one_line": "Octahedral block decomposition of exponent matrix",
+      "provides": [],
+      "depends": ["numpy (optional)"],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "octahedral-nfs/src/nullspace.py": {
+      "one_line": "Parallel GF(2) nullspace solver using octahedral decomposition",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "octahedral-nfs/src/rim.py": {
+      "one_line": "Residue intersect mapping replacing holographic tables",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "tier": "tool"
+    },
+    "octahedral-nfs/src/block_sqrt.py": {
+      "one_line": "Block-diagonal square root exploiting octahedral locality",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "tier": "tool"
+    },
+    "octahedral-nfs/phone_optimized_scaling.py": {
+      "one_line": "Phone-optimized validation with pause/resume and checkpoints",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "octahedral-nfs/hardware/detect.py": {
+      "one_line": "Hardware capability detection (OpenCL, RAM, thermal limits)",
+      "provides": [],
+      "depends": ["pyopencl (optional)"],
+      "runnable": false,
+      "tier": "tool"
+    },
+    "octahedral-nfs/examples/minimal.py": {
+      "one_line": "Minimal factorization example with no external dependencies",
+      "provides": [],
+      "depends": [],
+      "runnable": false,
+      "tier": "demo"
+    },
+    "Models/food-resilience.py": {
+      "one_line": "Michaelis-Menten yield + ENSO forcing with reserve buffers",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "tier": "demo"
+    },
+    "Models/Time-resource.py": {
+      "one_line": "Time-resource coupling across climate/infrastructure/community",
+      "provides": [],
+      "depends": ["numpy"],
+      "runnable": false,
+      "tier": "demo"
+    },
+    "run.py": {
+      "one_line": "Top-level entry point showing all available modules",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python run.py",
+      "tier": "core"
+    },
+    "irony.py": {
+      "one_line": "Philosophical essay — 'too complex' vs natural system precedents",
+      "provides": [],
+      "depends": [],
+      "runnable": true,
+      "run_cmd": "python irony.py",
+      "tier": "demo"
+    }
+  }
+}

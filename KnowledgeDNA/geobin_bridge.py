@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: KnowledgeDNA/geobin_bridge.py
+# PROVIDES: BRIDGE.GEIS_TO_SUBSTRATE
+# DEPENDS: stdlib-only
+# RUN: python -m KnowledgeDNA.geobin_bridge
+# TIER: bridge
+# GEIS vertex bits <-> substrate properties bidirectional bridge
 """
 KnowledgeDNA/geobin_bridge.py — Geometric-to-Binary ↔ Substrate Bridge
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

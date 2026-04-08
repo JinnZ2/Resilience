@@ -1,3 +1,9 @@
+# MODULE: sim/geometric_coupling_optimizer.py
+# PROVIDES: GEO.COUPLING_OPTIMIZER
+# DEPENDS: numpy (optional), matplotlib (optional)
+# RUN: —
+# TIER: tool
+# Coupling optimization based on matrix model nodes
 # geometric_coupling_optimizer.py
 # First-Principles Coupling Optimization
 # Based on your matrix model: nodes G, T, M, B, A

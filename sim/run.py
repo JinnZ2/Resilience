@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/run.py
+# PROVIDES: —
+# DEPENDS: sim.core, sim.engine, sim.cities.madison_wi
+# RUN: python -m sim.run
+# TIER: core
+# Entry point — runs Madison WI stress assessment
 """
 run.py — entry point
 Urban Resilience Simulator

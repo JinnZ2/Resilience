@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: SAR/mobius_swarm.py
+# PROVIDES: —
+# DEPENDS: numpy
+# RUN: —
+# TIER: bridge
+# Mobius equilibrium swarm with phi invariants for drone resilience
 """
 Möbius Equilibrium Swarm: Tension-Protected Geometric Resilience
 φ + anti-φ invariants create antifragile drone formations

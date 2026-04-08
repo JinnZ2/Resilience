@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: Rescue/rescue.py
+# PROVIDES: RESCUE.PROTOCOL, RESCUE.RESOURCE_ALLOCATION
+# DEPENDS: stdlib-only
+# RUN: python -m Rescue.rescue
+# TIER: bridge
+# Drone rescue operations in GPS-denied environments
 """
 Rescue/rescue.py — Drone Rescue Operations (Non-Lithium Fire)
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

@@ -1,3 +1,9 @@
+# MODULE: sim/physical_coupling_matrix.py
+# PROVIDES: COUPLING.PHYSICAL_MATRIX
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Cross-domain interaction strengths as coupling matrix
 # physical_coupling_matrix.py
 # First-Principles Energy Coupling
 # Interactions between fundamental physical fields

@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/schema_v2.py
+# PROVIDES: build_madison_v2
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: core
+# Tightened schema with cognitive readiness and decision authority
 """
 sim/schema_v2.py — tightened schema, v2
 Urban Resilience Simulator

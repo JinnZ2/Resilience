@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: KnowledgeDNA/knowledge_dna.py
+# PROVIDES: DNA.KNOWLEDGE_FIELD, DNA.FRAGILITY_ANALYSIS
+# DEPENDS: stdlib-only
+# RUN: python -m KnowledgeDNA.knowledge_dna
+# TIER: bridge
+# Knowledge ancestry and field propagation using directed graphs
 """
 KnowledgeDNA — Stdlib-Only Knowledge Ancestry and Field Propagation
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

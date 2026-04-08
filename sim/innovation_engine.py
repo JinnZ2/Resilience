@@ -1,3 +1,9 @@
+# MODULE: sim/innovation_engine.py
+# PROVIDES: —
+# DEPENDS: numpy (optional)
+# RUN: —
+# TIER: tool
+# Systematic innovation for power increase through new couplings
 # innovation_engine.py
 # Systematic Innovation for Power Increase
 # First-principles exploration of new couplings, captures, and loops

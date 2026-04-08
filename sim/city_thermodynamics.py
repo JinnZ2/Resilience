@@ -1,3 +1,9 @@
+# MODULE: sim/city_thermodynamics.py
+# PROVIDES: build_city_1000
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Institutions as thermodynamic engines with energy accounting
 # “””
 city_thermodynamics.py
 

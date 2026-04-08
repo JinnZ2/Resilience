@@ -1,3 +1,9 @@
+# MODULE: octahedral-nfs/src/factor_base.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Prime generation and octahedral mapping
 """
 Prime generation and octahedral mapping.
 

@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: run.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: python run.py
+# TIER: core
+# Top-level entry point showing all available modules
 """
 Resilience — Entry Point
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

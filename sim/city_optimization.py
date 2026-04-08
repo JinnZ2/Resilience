@@ -1,3 +1,9 @@
+# MODULE: sim/city_optimization.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Cross-domain upgrade evaluation and leakage auditing
 # “””
 city_optimization.py
 

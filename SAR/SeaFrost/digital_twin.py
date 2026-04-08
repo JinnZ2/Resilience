@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: SAR/SeaFrost/digital_twin.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: demo
+# Ship digital twin engine for fire response path pre-calculation
 """
 Ship Digital Twin: Pre-calculates fire response paths from vessel blueprints
 Parses container ship JSON → optimal wolf pack trajectories

@@ -1,3 +1,9 @@
+# MODULE: Models/Time-resource.py
+# PROVIDES: —
+# DEPENDS: numpy
+# RUN: —
+# TIER: demo
+# Time-resource coupling across climate/infrastructure/community
 import numpy as np
 
 # -----------------------------

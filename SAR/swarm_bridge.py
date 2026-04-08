@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: SAR/swarm_bridge.py
+# PROVIDES: —
+# DEPENDS: pymavlink (optional)
+# RUN: —
+# TIER: bridge
+# Drone swarm bridge — MAVLink/ArduPilot integration
 """
 WorkflowBridge Swarm: Geometry-proven drone resilience for SAR
 Icosahedral encoding → dodeca parity → nautilus allocation

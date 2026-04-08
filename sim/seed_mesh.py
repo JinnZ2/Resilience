@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/seed_mesh.py
+# PROVIDES: MESH.GRID_FAILURE_SIM, MESH.CASCADE_MITIGATION, MESH.GOSSIP_SYNC, MESH.MERKLE_DIFF
+# DEPENDS: sim.cities.coupling (optional)
+# RUN: python -m sim.seed_mesh
+# TIER: bridge
+# City resilience mesh bridge — grid failure simulation, gossip sync, Merkle diff
 """
 sim/seed_mesh.py — Seed Mesh Bridge to City Resilience Model
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim
@@ -20,7 +26,10 @@ USAGE:
 """
 
 import math
+import hashlib
 import random
+import time as _time
+from collections import deque
 from dataclasses import dataclass, field
 from typing import List, Dict, Tuple, Optional
 
@@ -628,6 +637,151 @@ def print_mesh_report(result: MeshRecoveryResult):
 
 
 # =============================================================================
+# GOSSIP SYNC — minimal-bandwidth state exchange between mesh nodes
+# =============================================================================
+#
+# Extracted from octahedral runtime design, rewritten stdlib-only.
+# In a degraded network, you can't broadcast full state to everyone.
+# Gossip sends only what the peer is missing, using hash comparison.
+
+@dataclass
+class GossipState:
+    """State vector for a mesh zone, hashable for diff detection."""
+    zone_name: str
+    seed_snapshot: List[float]     # current averaged seed across zone
+    coverage: float                # current coverage pct
+    node_count: int
+    epoch: int = 0                 # increments on state change
+
+    def digest(self) -> bytes:
+        """8-byte hash of current state — cheap to compare."""
+        raw = f"{self.zone_name}:{self.epoch}:{self.coverage:.4f}"
+        return hashlib.blake2b(raw.encode(), digest_size=8).digest()
+
+
+def gossip_diff(local: Dict[str, GossipState],
+                peer_digests: Dict[str, bytes]) -> Dict[str, GossipState]:
+    """
+    Compare local zone states against peer's digests.
+    Return only zones where local state differs — minimal payload.
+    """
+    updates = {}
+    for zone_name, state in local.items():
+        peer_hash = peer_digests.get(zone_name, b'')
+        if state.digest() != peer_hash:
+            updates[zone_name] = state
+    return updates
+
+
+def gossip_merge(local: Dict[str, GossipState],
+                 received: Dict[str, GossipState]) -> int:
+    """
+    Merge received gossip into local state.
+    Higher epoch wins. Returns count of zones updated.
+    """
+    merged = 0
+    for zone_name, remote_state in received.items():
+        if zone_name not in local:
+            local[zone_name] = remote_state
+            merged += 1
+        elif remote_state.epoch > local[zone_name].epoch:
+            local[zone_name] = remote_state
+            merged += 1
+    return merged
+
+
+# =============================================================================
+# MERKLE SYNC — detect divergence after network partition
+# =============================================================================
+#
+# When mesh fragments heal (zones reconnect after partition),
+# we need to know WHICH zones diverged — without comparing all state.
+# A Merkle tree over zone digests does this in O(log N) comparisons.
+
+def _merkle_hash(left: bytes, right: bytes) -> bytes:
+    """Combine two hashes into parent."""
+    return hashlib.blake2b(left + right, digest_size=16).digest()
+
+
+def merkle_root(zone_states: Dict[str, GossipState]) -> bytes:
+    """
+    Build Merkle root over sorted zone digests.
+    Two nodes with identical zone states produce identical roots.
+    """
+    if not zone_states:
+        return b'\x00' * 16
+
+    leaves = []
+    for name in sorted(zone_states.keys()):
+        leaves.append(zone_states[name].digest())
+
+    # Pad to even count
+    while len(leaves) > 1:
+        next_level = []
+        for i in range(0, len(leaves), 2):
+            if i + 1 < len(leaves):
+                next_level.append(_merkle_hash(leaves[i], leaves[i + 1]))
+            else:
+                next_level.append(leaves[i])
+        leaves = next_level
+
+    return leaves[0]
+
+
+def merkle_diff(local_states: Dict[str, GossipState],
+                remote_states: Dict[str, GossipState]) -> List[str]:
+    """
+    Return zone names that differ between local and remote.
+    Used after partition heals to know what to re-sync.
+    """
+    all_zones = set(local_states.keys()) | set(remote_states.keys())
+    differing = []
+    for zone in sorted(all_zones):
+        local_hash = local_states[zone].digest() if zone in local_states else b''
+        remote_hash = remote_states[zone].digest() if zone in remote_states else b''
+        if local_hash != remote_hash:
+            differing.append(zone)
+    return differing
+
+
+# =============================================================================
+# CIRCUIT BREAKER — rate-limit flapping mesh nodes
+# =============================================================================
+#
+# A node that keeps failing and recovering wastes everyone's bandwidth.
+# Circuit breaker stops re-broadcasting to it after N failures in T seconds.
+
+@dataclass
+class CircuitBreaker:
+    """Per-node rate limiter for mesh broadcasts."""
+    max_failures: int = 5
+    window_seconds: float = 60.0
+    _failures: Dict[str, deque] = field(default_factory=dict)
+
+    def record_failure(self, node_id: str):
+        """Record a failed transmission to node_id."""
+        if node_id not in self._failures:
+            self._failures[node_id] = deque()
+        self._failures[node_id].append(_time.time())
+
+    def allow(self, node_id: str) -> bool:
+        """Should we still try sending to this node?"""
+        if node_id not in self._failures:
+            return True
+        q = self._failures[node_id]
+        now = _time.time()
+        # Evict old entries
+        while q and q[0] < now - self.window_seconds:
+            q.popleft()
+        return len(q) < self.max_failures
+
+    def reset(self, node_id: str):
+        """Node recovered — clear its failure history."""
+        if node_id in self._failures:
+            self._failures[node_id].clear()
+
+
+# =============================================================================
 # DEMO
 # =============================================================================
 
@@ -665,3 +819,68 @@ if __name__ == "__main__":
     result = simulate_grid_failure(config)
 
     print_mesh_report(result)
+
+    # --- Gossip sync demo ---
+    print(f"\n{'='*66}")
+    print(f"  GOSSIP SYNC + MERKLE DIFF DEMO")
+    print(f"{'='*66}")
+
+    # Build gossip states from zones
+    local_gossip = {}
+    for z in result.zones:
+        avg_seed = [0.0] * 6
+        for n in z.nodes:
+            for d in range(6):
+                avg_seed[d] += n.seed[d]
+        if z.nodes:
+            avg_seed = [x / len(z.nodes) for x in avg_seed]
+        cov = z.coverage_history[-1] if z.coverage_history else 0.0
+        local_gossip[z.zone_name] = GossipState(
+            zone_name=z.zone_name,
+            seed_snapshot=avg_seed,
+            coverage=cov,
+            node_count=len(z.nodes),
+            epoch=1,
+        )
+
+    # Simulate a peer with stale state (epoch 0, different coverage)
+    peer_gossip = {}
+    for name, state in local_gossip.items():
+        peer_gossip[name] = GossipState(
+            zone_name=name,
+            seed_snapshot=state.seed_snapshot,
+            coverage=state.coverage * 0.5,  # stale
+            node_count=state.node_count,
+            epoch=0,
+        )
+
+    # Gossip diff: what does the peer need?
+    peer_digests = {name: s.digest() for name, s in peer_gossip.items()}
+    updates = gossip_diff(local_gossip, peer_digests)
+    print(f"\n  Gossip: {len(updates)}/{len(local_gossip)} zones need sync")
+
+    # Merkle root comparison
+    local_root = merkle_root(local_gossip)
+    peer_root = merkle_root(peer_gossip)
+    print(f"  Merkle root match: {local_root == peer_root}")
+    if local_root != peer_root:
+        diffs = merkle_diff(local_gossip, peer_gossip)
+        print(f"  Diverged zones: {diffs}")
+
+    # Merge: peer accepts our updates
+    merged = gossip_merge(peer_gossip, updates)
+    print(f"  Merged {merged} zones into peer state")
+    post_root = merkle_root(peer_gossip)
+    print(f"  Post-merge Merkle match: {local_root == post_root}")
+
+    # Circuit breaker demo
+    print(f"\n  Circuit breaker:")
+    cb = CircuitBreaker(max_failures=3, window_seconds=10.0)
+    for i in range(5):
+        cb.record_failure("flaky_node")
+        allowed = cb.allow("flaky_node")
+        print(f"    Failure {i+1}: broadcast {'allowed' if allowed else 'BLOCKED'}")
+    cb.reset("flaky_node")
+    print(f"    After reset: broadcast {'allowed' if cb.allow('flaky_node') else 'BLOCKED'}")
+
+    print(f"\n{'='*66}\n")

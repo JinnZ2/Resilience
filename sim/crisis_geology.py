@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/crisis_geology.py
+# PROVIDES: RESILIENCE.CRISIS_GEOLOGY
+# DEPENDS: stdlib-only
+# RUN: python -m sim.crisis_geology
+# TIER: domain
+# Geothermal transducer sensor network for crisis early warning
 """
 sim/crisis_geology.py — Crisis Geology x Energy Resilience
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: Rescue/energy_efficient_ai.py
+# PROVIDES: RESCUE.ENERGY_EFFICIENT_AI
+# DEPENDS: stdlib-only
+# RUN: python -m Rescue.energy_efficient_ai
+# TIER: tool
+# Energy-efficient AI for resource-constrained rescue operations
 """
 Rescue/energy_efficient_ai.py — Energy-Efficient AI for Resource-Constrained Operations
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

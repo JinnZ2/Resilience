@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/resource_flow_dynamics.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: python -m sim.resource_flow_dynamics
+# TIER: domain
+# Coupled resource flow dynamics — hoarding vs circulation
 """
 sim/resource_flow_dynamics.py — Coupled Resource Flow Dynamics
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

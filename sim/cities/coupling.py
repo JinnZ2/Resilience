@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/cities/coupling.py
+# PROVIDES: RESILIENCE.COUPLING_EDGE, RESILIENCE.KNOWLEDGE_DECAY
+# DEPENDS: stdlib-only
+# RUN: python -m sim.cities.coupling
+# TIER: domain
+# Cross-domain coupling and cascade amplification dynamics
 """
 sim/coupling.py — cross-domain coupling and cascade amplification
 Urban Resilience Simulator

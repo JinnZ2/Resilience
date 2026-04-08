@@ -1,3 +1,9 @@
+# MODULE: sim/purpose_deviation.py
+# PROVIDES: —
+# DEPENDS: sim.city_thermodynamics (optional), sim.city_optimization (optional)
+# RUN: —
+# TIER: domain
+# Institutional drift measurement from ungameable physical signals
 # “””
 purpose_deviation.py
 

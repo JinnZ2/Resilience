@@ -1,3 +1,9 @@
+# MODULE: sim/institutional_first_principles.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Institution thermodynamic deconstruction and operator trust decay
 # “””
 InstitutionalFirstPrinciples.py
 

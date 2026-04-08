@@ -1,3 +1,9 @@
+# MODULE: octahedral-nfs/src/holographic.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Holographic smoothness detection for NFS
 """
 Holographic smoothness detection.
 

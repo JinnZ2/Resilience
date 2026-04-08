@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: GoatHerd/herd.py
+# PROVIDES: HERD.GRAZING_ROTATION, HERD.HEALTH_TRACKING
+# DEPENDS: stdlib-only
+# RUN: python -m GoatHerd.herd
+# TIER: demo
+# Village goat herding assistant — logistic growth, zone scoring
 """
 GoatHerd/herd.py — Village Goat Herding Assistant
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

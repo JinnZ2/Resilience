@@ -1,3 +1,9 @@
+# MODULE: sim/geometric_exploration.py
+# PROVIDES: GEO.EXPLORATION
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: domain
+# Octahedral field structure exploration — historical alternatives generator
 # geometric_exploration.py
 # Exploration Module: Finding What Was Erased, What Could Have Been
 # Searches ghost patterns, historical alternatives, and novel combinations

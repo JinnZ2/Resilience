@@ -1,3 +1,9 @@
+# MODULE: octahedral-nfs/examples/minimal.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: demo
+# Minimal factorization example with no external dependencies
 """
 Minimal factorization example - runs on anything with Python.
 No numpy, no OpenCL required.

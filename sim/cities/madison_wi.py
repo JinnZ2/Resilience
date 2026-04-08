@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/cities/madison_wi.py
+# PROVIDES: build_madison
+# DEPENDS: sim.core
+# RUN: —
+# TIER: demo
+# Madison WI city model — build_madison() with real infrastructure data
 """
 sim/cities/madison_wi.py — first populated city
 Urban Resilience Simulator

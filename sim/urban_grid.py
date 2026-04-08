@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/urban_grid.py
+# PROVIDES: RESILIENCE.URBAN_GRID
+# DEPENDS: stdlib-only
+# RUN: python -m sim.urban_grid
+# TIER: domain
+# Urban magnomechanical grid retrofit with transducer networks
 """
 sim/urban_grid.py — Urban Magnomechanical Grid
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

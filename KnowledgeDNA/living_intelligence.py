@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: KnowledgeDNA/living_intelligence.py
+# PROVIDES: DNA.TEACHER_GRAPH, SUBSTRATE.LIVING_EQUATIONS
+# DEPENDS: stdlib-only
+# RUN: python -m KnowledgeDNA.living_intelligence
+# TIER: bridge
+# Living Intelligence Database connector — 38 teachers as equations
 """
 KnowledgeDNA/living_intelligence.py — Living Intelligence Database Connector
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

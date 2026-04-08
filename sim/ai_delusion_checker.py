@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: sim/ai_delusion_checker.py
+# PROVIDES: AUDIT.DELUSION_DETECTION, AUDIT.SIX_SIGMA, AUDIT.PLAUSIBILITY
+# DEPENDS: stdlib-only
+# RUN: python -m sim.ai_delusion_checker
+# TIER: tool
+# Systemic assumption detector — delusion patterns, Six Sigma audit, S_e=0
 """
 sim/ai_delusion_checker.py — Detect Systemic Assumptions in AI Datasets
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

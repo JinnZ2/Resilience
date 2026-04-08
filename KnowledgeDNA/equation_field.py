@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: KnowledgeDNA/equation_field.py
+# PROVIDES: EQUATION.FIELD_OVERLAP, EQUATION.MULTI_PURPOSE_REUSE
+# DEPENDS: stdlib-only
+# RUN: python -m KnowledgeDNA.equation_field
+# TIER: bridge
+# 14 equations x 15 domains — overlap scoring and bridge discovery
 """
 KnowledgeDNA/equation_field.py — Equation Field Overlap Simulator
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

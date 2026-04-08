@@ -1,3 +1,9 @@
+# MODULE: sim/thermodynamic_impact.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Replaces IMPLAN with thermodynamic reality accounting
 # “””
 thermodynamic_impact.py
 

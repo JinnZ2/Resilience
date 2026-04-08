@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: SAR/workflow_bridge.py
+# PROVIDES: SAR.GEOMETRIC_PIPELINE, SAR.WAYPOINT_EXPORT
+# DEPENDS: stdlib-only
+# RUN: python -m SAR.workflow_bridge
+# TIER: bridge
+# Stdlib-only geometric swarm engine with fault tolerance
 """
 SAR/workflow_bridge.py — Stdlib-Only Geometric Swarm Engine
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim

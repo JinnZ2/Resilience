@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# MODULE: octahedral-nfs/src/rim.py
+# PROVIDES: —
+# DEPENDS: stdlib-only
+# RUN: —
+# TIER: tool
+# Residue intersect mapping replacing holographic tables
 """
 octahedral-nfs/src/rim.py — Residue Intersect Mapping
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim
