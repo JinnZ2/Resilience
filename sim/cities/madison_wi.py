@@ -10,7 +10,7 @@ sim/cities/madison_wi.py — first populated city
 Urban Resilience Simulator
 CC0 public domain — github.com/JinnZ2/urban-resilience-sim
 
-Data sources: on-route observation (Kavik, 2024-2026),
+Data sources: on-route observation (JinnZ2, 2024-2026),
 UW-Madison public records, MMSD infrastructure reports,
 Perplexity independent validation (March 2026).
 
