@@ -150,7 +150,7 @@ def build_superior_tomah_corridor() -> list[DependencyNode]:
     US-53 / US-2 corridor.
     Superior WI → Tomah WI.
     ~200 miles. Food distribution spine.
-    Kavik's operational territory.
+    JinnZ2's operational territory.
 
     Power numbers are estimates calibrated to
     regional facility scale.
